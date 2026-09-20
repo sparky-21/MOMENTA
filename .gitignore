@@ -1,0 +1,14 @@
+# Maven build output
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Runtime database (this is user data, not source code)
+momenta.db
+
+# OS files
+.DS_Store
+Thumbs.db
