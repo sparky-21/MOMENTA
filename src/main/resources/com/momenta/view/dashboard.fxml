@@ -47,7 +47,7 @@
                     style="-fx-background-color: transparent; -fx-text-fill: #b6b9c2; -fx-background-radius: 8; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12;"/>
             <Button text="↻  Habits" maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: #b6b9c2; -fx-background-radius: 8; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12;"/>
-            <Button text="$ Finance" maxWidth="Infinity"
+            <Button text="\$ Finance" maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: #b6b9c2; -fx-background-radius: 8; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12;"/>
             <Button text="◉  Focus" maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: #b6b9c2; -fx-background-radius: 8; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12;"/>
