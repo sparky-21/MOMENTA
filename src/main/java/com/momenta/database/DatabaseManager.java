@@ -73,6 +73,8 @@ public final class DatabaseManager {
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
+                email TEXT UNIQUE,
+                password TEXT,
                 profile_type TEXT DEFAULT 'Other',
                 xp INTEGER DEFAULT 0,
                 level INTEGER DEFAULT 1,
