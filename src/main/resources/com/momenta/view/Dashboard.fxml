@@ -48,7 +48,10 @@
                     maxWidth="Infinity"
                     onAction="#onOpenFinance"/>
 
-            <Button text="Focus" maxWidth="Infinity" disable="true"/>
+            <!-- PHASE 9 -->
+            <Button text="Focus"
+                    maxWidth="Infinity"
+                    onAction="#onOpenFocus"/>
             <Button text="Analytics" maxWidth="Infinity" disable="true"/>
 
             <Separator/>
