@@ -5,6 +5,7 @@ import com.momenta.service.GoalService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.CurrentUser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -36,7 +37,6 @@ public class GoalController {
 
     private final GoalService goalService = new GoalService();
     private final ObservableList<Goal> goals = FXCollections.observableArrayList();
-    private static final int CURRENT_USER_ID = 1;
 
     @FXML
     public void initialize() {
@@ -65,8 +65,8 @@ public class GoalController {
         javafx.concurrent.Task<List<Goal>> loadTask = new javafx.concurrent.Task<>() {
             @Override
             protected List<Goal> call() {
-                goalService.recalculateAllProgress(CURRENT_USER_ID);
-                return goalService.getAllGoals(CURRENT_USER_ID);
+                goalService.recalculateAllProgress(CurrentUser.getId());
+                return goalService.getAllGoals(CurrentUser.getId());
             }
         };
         loadTask.setOnSucceeded(e -> {

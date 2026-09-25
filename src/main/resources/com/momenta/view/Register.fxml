@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.momenta.controller.RegisterController">
+    <center>
+        <VBox alignment="CENTER" spacing="12" maxWidth="450">
+            <padding><Insets top="35" right="40" bottom="35" left="40"/></padding>
+            <Label text="Create your MOMENTA account"><font><Font name="System Bold" size="24"/></font></Label>
+            <TextField fx:id="nameField" promptText="Full name"/>
+            <TextField fx:id="usernameField" promptText="Username"/>
+            <PasswordField fx:id="passwordField" promptText="Password (minimum 6 characters)"/>
+            <PasswordField fx:id="confirmPasswordField" promptText="Confirm password"/>
+            <ComboBox fx:id="professionBox" promptText="Select profession" maxWidth="Infinity"/>
+            <TextField fx:id="otherProfessionField" promptText="Enter your profession" visible="false" managed="false"/>
+            <Label fx:id="messageLabel" text="" wrapText="true"/>
+            <Button text="CREATE ACCOUNT" maxWidth="Infinity" onAction="#onRegister"/>
+            <Button text="Back to Login" maxWidth="Infinity" onAction="#onBack"/>
+        </VBox>
+    </center>
+</BorderPane>

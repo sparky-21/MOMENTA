@@ -7,6 +7,7 @@ import com.momenta.service.ProjectService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.CurrentUser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -37,7 +38,6 @@ public class ProjectController {
     private final GoalService goalService = new GoalService();
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
     private final ObservableList<Goal> availableGoals = FXCollections.observableArrayList();
-    private static final int CURRENT_USER_ID = 1;
 
     @FXML
     public void initialize() {
@@ -62,8 +62,8 @@ public class ProjectController {
         javafx.concurrent.Task<Object[]> loadTask = new javafx.concurrent.Task<>() {
             @Override
             protected Object[] call() {
-                List<Goal> goals = goalService.getAllGoals(CURRENT_USER_ID);
-                List<Project> projectList = projectService.getAllProjects(CURRENT_USER_ID);
+                List<Goal> goals = goalService.getAllGoals(CurrentUser.getId());
+                List<Project> projectList = projectService.getAllProjects(CurrentUser.getId());
                 return new Object[]{goals, projectList};
             }
         };

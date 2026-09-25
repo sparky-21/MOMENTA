@@ -30,7 +30,7 @@ public class Main extends Application {
         // SceneManager owns the Stage from here on; it loads Dashboard.fxml
         // as the first view. Views are added via SceneManager.switchTo(...).
         SceneManager.getInstance().init(primaryStage);
-        SceneManager.getInstance().switchTo("Dashboard");
+        SceneManager.getInstance().switchTo("Login");
 
         primaryStage.setTitle("MOMENTA — Personal Operating System");
         primaryStage.setMinWidth(1100);

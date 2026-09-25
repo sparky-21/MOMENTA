@@ -7,6 +7,7 @@ import com.momenta.service.TaskService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.CurrentUser;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -56,9 +57,6 @@ public class CalendarController {
     private final EventService eventService = new EventService();
 
     private final TaskService taskService = new TaskService();
-
-
-    private static final int CURRENT_USER_ID = 1;
 
     private static final DateTimeFormatter HEADER_FORMAT =
             DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH);
@@ -209,12 +207,12 @@ public class CalendarController {
 
                         List<Event> events =
                                 eventService.getAllEvents(
-                                        CURRENT_USER_ID);
+                                        CurrentUser.getId());
 
 
                         List<Task> tasks =
                                 taskService.getAllTasks(
-                                        CURRENT_USER_ID);
+                                        CurrentUser.getId());
 
 
                         return new CalendarData(
@@ -1078,7 +1076,7 @@ public class CalendarController {
 
 
                     event.setUserId(
-                            CURRENT_USER_ID);
+                            CurrentUser.getId());
 
 
                     event.setTitle(

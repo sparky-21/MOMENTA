@@ -2,11 +2,14 @@ package com.momenta.controller;
 
 import com.momenta.engine.MomentaCore;
 import com.momenta.model.Task;
+import com.momenta.network.InsightService;
+import com.momenta.network.Quote;
 import com.momenta.service.GoalService;
 import com.momenta.service.ProjectService;
 import com.momenta.service.TaskService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.CurrentUser;
 
 import java.util.List;
 import javafx.animation.FadeTransition;
@@ -52,17 +55,20 @@ public class DashboardController {
     @FXML private Label nowDeadlineLabel;
     @FXML private Label nowReasonsLabel;
     @FXML private ProgressBar nowProgressBar;
+    @FXML private Label insightLabel;
+    @FXML private Label insightAuthorLabel;
 
     private final TaskService taskService = new TaskService();
     private final MomentaCore momentaCore = new MomentaCore();
     private final GoalService goalService = new GoalService();
     private final ProjectService projectService = new ProjectService();
-    private static final int CURRENT_USER_ID = 1; // single-user for now (Phase 1-4)
+    private final InsightService insightService = new InsightService();
 
     @FXML
     public void initialize() {
         greetingLabel.setText(greetingForNow());
         loadDashboardData();
+        loadDailyInsight();
     }
 
     /**
@@ -75,12 +81,12 @@ public class DashboardController {
             @Override
             protected DashboardData call() {
                 int incompleteCount =
-                        taskService.getIncompleteTasks(CURRENT_USER_ID).size();
+                        taskService.getIncompleteTasks(CurrentUser.getId()).size();
                 MomentaCore.Recommendation recommendation =
-                        momentaCore.recommend(CURRENT_USER_ID);
-                long activeGoals = goalService.getAllGoals(CURRENT_USER_ID).stream()
+                        momentaCore.recommend(CurrentUser.getId());
+                long activeGoals = goalService.getAllGoals(CurrentUser.getId()).stream()
                         .filter(g -> "ACTIVE".equals(g.getStatus())).count();
-                long activeProjects = projectService.getAllProjects(CURRENT_USER_ID).stream()
+                long activeProjects = projectService.getAllProjects(CurrentUser.getId()).stream()
                         .filter(p -> "ACTIVE".equals(p.getStatus())).count();
                 return new DashboardData(incompleteCount, recommendation, (int) activeGoals, (int) activeProjects);
             }
@@ -162,6 +168,34 @@ public class DashboardController {
     @FXML
     private void onRefresh() {
         loadDashboardData();
+        loadDailyInsight();
+    }
+
+    @FXML
+    private void onRefreshInsight() {
+        loadDailyInsight();
+    }
+
+    private void loadDailyInsight() {
+        javafx.concurrent.Task<Quote> networkTask = new javafx.concurrent.Task<>() {
+            @Override
+            protected Quote call() throws Exception {
+                return insightService.getDailyInsight();
+            }
+        };
+
+        networkTask.setOnSucceeded(e -> {
+            Quote quote = networkTask.getValue();
+            insightLabel.setText("\"" + quote.getQuote() + "\"");
+            insightAuthorLabel.setText("— " + quote.getAuthor());
+        });
+
+        networkTask.setOnFailed(e -> {
+            insightLabel.setText("Daily insight is unavailable right now.");
+            insightAuthorLabel.setText("Please check your internet connection.");
+        });
+
+        TaskExecutor.getInstance().workPool().submit(networkTask);
     }
 
     private String greetingForNow() {

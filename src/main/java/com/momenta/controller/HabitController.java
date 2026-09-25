@@ -5,6 +5,7 @@ import com.momenta.service.HabitService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.CurrentUser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,7 +27,6 @@ public class HabitController {
 
     private final HabitService service=new HabitService();
     private final ObservableList<Habit> habits=FXCollections.observableArrayList();
-    private static final int CURRENT_USER_ID=1;
 
     @FXML public void initialize(){
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -39,7 +39,7 @@ public class HabitController {
 
     private void loadHabits(){
         javafx.concurrent.Task<java.util.List<Habit>> t=new javafx.concurrent.Task<>(){
-            @Override protected java.util.List<Habit> call(){return service.getAllHabits(CURRENT_USER_ID);}
+            @Override protected java.util.List<Habit> call(){return service.getAllHabits(CurrentUser.getId());}
         };
         t.setOnSucceeded(e->{habits.setAll(t.getValue()); updateSelection();});
         t.setOnFailed(e->AlertUtil.showError("Load failed","Could not load habits.",t.getException()));
@@ -77,7 +77,7 @@ public class HabitController {
         boolean edit=existing!=null; Dialog<Habit> dialog=new Dialog<>();dialog.setTitle(edit?"Edit Habit":"New Habit");dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK,ButtonType.CANCEL);
         TextField name=new TextField(edit?existing.getName():"");name.setPromptText("e.g. Read 20 minutes");
         GridPane grid=new GridPane();grid.setHgap(10);grid.setVgap(10);grid.addRow(0,new Label("Name"),name);dialog.getDialogPane().setContent(grid);
-        dialog.setResultConverter(b->{if(b!=ButtonType.OK)return null;if(name.getText().isBlank()){AlertUtil.showInfo("Name required","Enter a habit name.");return null;}Habit h=edit?existing:new Habit();h.setUserId(CURRENT_USER_ID);h.setName(name.getText().trim());return h;});
+        dialog.setResultConverter(b->{if(b!=ButtonType.OK)return null;if(name.getText().isBlank()){AlertUtil.showInfo("Name required","Enter a habit name.");return null;}Habit h=edit?existing:new Habit();h.setUserId(CurrentUser.getId());h.setName(name.getText().trim());return h;});
         return dialog.showAndWait();
     }
     private <T> void run(java.util.concurrent.Callable<T> work,java.util.function.Consumer<T> done){

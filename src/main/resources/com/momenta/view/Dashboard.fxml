@@ -182,6 +182,17 @@
 
             </TitledPane>
 
+            <TitledPane text="DAILY PRODUCTIVITY INSIGHT" collapsible="false">
+                <VBox spacing="8">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <Label fx:id="insightLabel" text="Loading daily insight..." wrapText="true"/>
+                    <Label fx:id="insightAuthorLabel" text="" wrapText="true"/>
+                    <Button text="Refresh Insight" onAction="#onRefreshInsight"/>
+                </VBox>
+            </TitledPane>
+
         </VBox>
     </center>
 

@@ -9,6 +9,7 @@ import com.momenta.service.TaskService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.CurrentUser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -43,7 +44,6 @@ public class TaskController {
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
     private final ObservableList<Goal> availableGoals = FXCollections.observableArrayList();
     private final ObservableList<Project> availableProjects = FXCollections.observableArrayList();
-    private static final int CURRENT_USER_ID = 1;
 
     private static final List<String> CATEGORIES =
             List.of("Work", "Personal", "Study", "Family", "Finance", "Health", "Project", "Other");
@@ -66,9 +66,9 @@ public class TaskController {
         javafx.concurrent.Task<Object[]> loadTask = new javafx.concurrent.Task<>() {
             @Override
             protected Object[] call() {
-                List<Task> taskList = taskService.getAllTasks(CURRENT_USER_ID);
-                List<Goal> goals = goalService.getAllGoals(CURRENT_USER_ID);
-                List<Project> projectList = projectService.getAllProjects(CURRENT_USER_ID);
+                List<Task> taskList = taskService.getAllTasks(CurrentUser.getId());
+                List<Goal> goals = goalService.getAllGoals(CurrentUser.getId());
+                List<Project> projectList = projectService.getAllProjects(CurrentUser.getId());
                 return new Object[]{taskList, goals, projectList};
             }
         };

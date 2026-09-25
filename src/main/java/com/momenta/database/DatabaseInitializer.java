@@ -30,6 +30,8 @@ public final class DatabaseInitializer {
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
+                    username TEXT UNIQUE,
+                    password_hash TEXT,
                     persona TEXT DEFAULT 'Other',
                     created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 );
@@ -185,13 +187,10 @@ public final class DatabaseInitializer {
                 );
             """);
 
-            // A single default user row so early phases (before Login.fxml
-            // exists) have a user_id=1 to attach tasks to.
-            stmt.execute("""
-                INSERT INTO users (id, name, persona)
-                SELECT 1, 'Zigi', 'Student'
-                WHERE NOT EXISTS (SELECT 1 FROM users WHERE id = 1);
-            """);
+            // Phase 12 migration: older MOMENTA databases were created before
+            // username/password columns existed. Add the columns without
+            // deleting any existing data.
+            migrateUsersTable();
 
             System.out.println("MOMENTA database ready (momenta.db).");
 
@@ -199,4 +198,38 @@ public final class DatabaseInitializer {
             throw new RuntimeException("Failed to initialize database schema", e);
         }
     }
+    private static void migrateUsersTable() {
+        try (Statement stmt = DatabaseConnection.getConnection().createStatement()) {
+            boolean hasUsername = false;
+            boolean hasPasswordHash = false;
+
+            try (var rs = stmt.executeQuery("PRAGMA table_info(users)")) {
+                while (rs.next()) {
+                    String column = rs.getString("name");
+                    if ("username".equalsIgnoreCase(column)) hasUsername = true;
+                    if ("password_hash".equalsIgnoreCase(column)) hasPasswordHash = true;
+                }
+            }
+
+            if (!hasUsername) {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN username TEXT");
+            }
+            if (!hasPasswordHash) {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN password_hash TEXT");
+            }
+
+            // Enforce uniqueness for newly registered usernames.
+            // If a legacy database contains duplicate non-null usernames, the
+            // unique index creation may fail; registration still remains safe
+            // because the service checks usernameExists before inserting.
+            try {
+                stmt.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)");
+            } catch (SQLException ignored) {
+                // Legacy data can be repaired manually without blocking startup.
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to migrate users table", e);
+        }
+    }
+
 }
