@@ -167,6 +167,18 @@ public class DashboardController {
         if (hour < 17) return "Good afternoon";
         return "Good evening";
     }
+    @FXML
+    private void onOpenHabits() {
+        SceneManager.getInstance().invalidate("Habits");
+        SceneManager.getInstance().switchTo("Habits");
+    }
+
+    @FXML
+    private void onOpenFinance() {
+        SceneManager.getInstance().invalidate("Finance");
+        SceneManager.getInstance().switchTo("Finance");
+    }
+
 
     /** Simple carrier record for the background load result. */
     private record DashboardData(int incompleteCount, Task recommendation,
