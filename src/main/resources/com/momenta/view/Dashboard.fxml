@@ -32,7 +32,7 @@
             <Button text="Tasks" maxWidth="Infinity" onAction="#onOpenTasks"/>
             <Button text="Goals" maxWidth="Infinity" onAction="#onOpenGoals"/>
             <Button text="Projects" maxWidth="Infinity" onAction="#onOpenProjects"/>
-            <Button text="Calendar" maxWidth="Infinity" disable="true"/>
+            <Button text="Calendar" maxWidth="Infinity" onAction="#onOpenCalendar"/>
             <Button text="Habits" maxWidth="Infinity" disable="true"/>
             <Button text="Finance" maxWidth="Infinity" disable="true"/>
             <Button text="Focus" maxWidth="Infinity" disable="true"/>

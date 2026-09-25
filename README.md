@@ -1,101 +1,61 @@
-# MOMENTA — Personal Operating System (Phase 1–5)
+# MOMENTA — Phase 6: Google Calendar-Style Calendar + Events
 
-This is the foundation build: project skeleton, MVC + DAO wiring, the full
-SQLite schema for every module in the spec, **Task Management** wired all
-the way from FXML through to SQL and back with the **MOMENTA NOW** priority
-recommendation on top, and now **Goals + Projects** (Phase 5).
+This ZIP contains the MOMENTA project with Phase 5 functionality preserved and a redesigned Phase 6 Calendar.
 
-## What's new in Phase 5
+## Phase 6 features
 
-- **Goals** (`model/Goal.java`, `dao/GoalDAO(+Impl).java`, `service/GoalService.java`,
-  `controller/GoalController.java`, `view/Goals.fxml`): hierarchical via
-  `parentGoalId` (Life Goal → Year Goal → Monthly Goal...). Progress is
-  **not** typed in by hand — `GoalService.recalculateProgress()` derives it
-  from the completion % of tasks linked to that goal (§7).
-- **Projects** (`model/Project.java`, `dao/ProjectDAO(+Impl).java`,
-  `service/ProjectService.java`, `controller/ProjectController.java`,
-  `view/Projects.fxml`): optionally linked to a Goal. Progress is computed
-  **live** on every load from linked tasks — never stored, so it can't go
-  stale (§8 — "calculated dynamically" taken literally: the `projects`
-  table has no `progress` column at all).
-- **Task ↔ Goal/Project linkage**: the task dialog (`TaskController`) now
-  has Project and Goal dropdowns. Creating/completing/deleting a task
-  invalidates the Dashboard, Goals, and Projects views so their numbers
-  are never stale the next time you open them.
-- **Dashboard**: two new cards (Active Goals, Active Projects), and Goals /
-  Projects sidebar buttons are now enabled.
+- Google Calendar-style monthly grid (7 columns × 6 weeks)
+- Previous month / next month navigation
+- Today button
+- Selected date display
+- Current day highlight
+- Events displayed directly inside calendar date cells
+- Tasks/deadlines from the existing Phase 5 Task module displayed on their deadline dates
+- Add Event button
+- Double-click an empty date cell to create an event for that date
+- Click an event to edit it
+- Event persistence through SQLite
+- Existing DAO → Service → Controller architecture preserved
+- Existing Phase 5 Goals, Projects and Tasks preserved
 
-## What's included (Phases 1–4)
+## Event flow
 
-| Layer | Files | Spec section |
-|---|---|---|
-| Entry point | `application/Main.java` | §31 |
-| Database | `database/DatabaseConnection.java`, `database/DatabaseInitializer.java` | §18, §19 |
-| Model | `model/Task.java` (JavaFX Properties) | §6 |
-| DAO | `dao/TaskDAO.java`, `dao/impl/TaskDAOImpl.java` | §20 |
-| Service | `service/TaskService.java` | §14 |
-| Engine | `engine/PriorityEngine.java` — deterministic, explainable scoring | §15 |
-| Threading | `threading/TaskExecutor.java` — bounded pool, clean shutdown | §21, §23 |
-| Controllers | `controller/DashboardController.java`, `controller/TaskController.java` | §5, §6, §16 |
-| Utility | `utility/SceneManager.java`, `utility/AlertUtil.java` | §24, §34 |
-| Views | `view/Dashboard.fxml`, `view/Tasks.fxml` — **no CSS anywhere** | §2 |
+CalendarController → EventService → EventDAO → SQLite
 
-The `momenta.db` SQLite file will be created automatically on first run,
-with all 12 tables from §18 (users, tasks, goals, projects, events, habits,
-habit_logs, expenses, income, focus_sessions, notifications, settings) —
-even though only `tasks` is wired up to the UI yet, so later phases
-(Goals, Projects, Habits, Finance...) don't need schema changes.
+Tasks are read from the existing TaskService/TaskDAO and are not duplicated in the Calendar module.
 
-## How to build and run
+## Run
 
-You need **JDK 17+** and **Maven** installed.
+From the project root:
 
-```bash
-cd MOMENTA
-mvn clean javafx:run
-```
+    mvn clean javafx:run
 
-Maven will download JavaFX 21 and the `sqlite-jdbc` driver automatically
-the first time (both are declared in `pom.xml`).
+## Phase 6 Git workflow
 
-If you're using **IntelliJ IDEA**: open the folder as a Maven project,
-let it import, then run `Main.java` directly, or use the Maven `javafx:run`
-goal from the Maven side panel.
+1. Start from the Phase 5 branch:
 
-## Demonstrating the "one action propagates" principle (§36)
+    git switch momenta-phase-5-goals-projects
+    git pull origin momenta-phase-5-goals-projects
 
-1. Launch → Dashboard loads (background thread fetches incomplete tasks).
-2. Click **Open Tasks** → **Add Task** → fill in title, deadline, importance.
-3. Save → `TaskService.createTask()` runs the `PriorityEngine`, then
-   `TaskDAOImpl` inserts a row into SQLite.
-4. Go back to **Dashboard** → it reloads (cache invalidated) and **MOMENTA
-   NOW** now recommends whichever task scored highest, with reasons shown.
+2. Create the Phase 6 branch:
 
-That's the full chain: `UI → Controller → Service → Engine → DAO →
-Database → UI`, with the JavaFX Application Thread never blocked (every
-DB call above runs inside a `javafx.concurrent.Task` on
-`TaskExecutor.workPool()`).
+    git switch -c momenta-phase-6-calendar-events
 
-## No CSS, as required
+3. Test the application, then commit:
 
-No `application.css` file exists anywhere in this project, and no FXML
-node uses an inline `style="-fx-..."` attribute or `setStyle(...)` call in
-Java. Layout and visual structure come entirely from `BorderPane` /
-`VBox` / `HBox` / `TitledPane` / `Separator` and `Font`, per §24 and §30.
+    git add .
+    git commit -m "Implement phase 6 Google Calendar style calendar"
 
-## Roadmap — what's next
+4. Push:
 
-Following the phases in the spec (§37), the next builds are:
+    git push -u origin momenta-phase-6-calendar-events
 
-- **Phase 6**: Calendar + Events
-- **Phase 7–8**: Habits, Finance
-- **Phase 9**: Focus Mode (Timeline-based countdown, session logging)
-- **Phase 10–11**: `MomentaCore` + full Recommendation Engine
-- **Phase 12–14**: Deadline scheduler (`ScheduledExecutorService`),
-  Analytics (charts), Notifications
-- **Phase 15–18**: UI refinement, animations, Command Palette (Ctrl+K),
-  integration testing
+5. Open a Pull Request from:
 
-Ask for the next phase whenever you're ready — each one builds directly
-on this skeleton without touching what already works, per §37's own rule
-("preserve previously implemented functionality").
+    momenta-phase-6-calendar-events
+
+   into:
+
+    momenta-phase-5-goals-projects
+
+The file PHASE6_GIT_COMMANDS.txt contains the commands in order.

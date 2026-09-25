@@ -151,6 +151,12 @@ public class DashboardController {
     }
 
     @FXML
+    private void onOpenCalendar() {
+        SceneManager.getInstance().invalidate("Calendar");
+        SceneManager.getInstance().switchTo("Calendar");
+    }
+
+    @FXML
     private void onRefresh() {
         loadDashboardData();
     }
