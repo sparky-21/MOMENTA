@@ -179,9 +179,15 @@ public class DashboardController {
         SceneManager.getInstance().switchTo("Finance");
     }
 
+    @FXML
+    private void onOpenFocus() {
+        SceneManager.getInstance().invalidate("Focus");
+        SceneManager.getInstance().switchTo("Focus");
+    }
+
 
     /** Simple carrier record for the background load result. */
     private record DashboardData(int incompleteCount, Task recommendation,
-                                  int activeGoals, int activeProjects) {
+                                 int activeGoals, int activeProjects) {
     }
 }
