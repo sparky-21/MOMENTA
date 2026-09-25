@@ -1,18 +1,20 @@
 package com.momenta.controller;
 
+import com.momenta.engine.MomentaCore;
 import com.momenta.model.Task;
 import com.momenta.service.GoalService;
 import com.momenta.service.ProjectService;
 import com.momenta.service.TaskService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.SceneManager;
+
+import java.util.List;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.util.Duration;
 
-import java.util.List;
 
 /**
  * Controller for Dashboard.fxml (Section 5 + Section 16 MOMENTA NOW).
@@ -52,6 +54,7 @@ public class DashboardController {
     @FXML private ProgressBar nowProgressBar;
 
     private final TaskService taskService = new TaskService();
+    private final MomentaCore momentaCore = new MomentaCore();
     private final GoalService goalService = new GoalService();
     private final ProjectService projectService = new ProjectService();
     private static final int CURRENT_USER_ID = 1; // single-user for now (Phase 1-4)
@@ -71,13 +74,15 @@ public class DashboardController {
         javafx.concurrent.Task<DashboardData> loadTask = new javafx.concurrent.Task<>() {
             @Override
             protected DashboardData call() {
-                List<Task> incomplete = taskService.getIncompleteTasks(CURRENT_USER_ID);
-                Task recommended = taskService.getMomentaNowRecommendation(CURRENT_USER_ID);
+                int incompleteCount =
+                        taskService.getIncompleteTasks(CURRENT_USER_ID).size();
+                MomentaCore.Recommendation recommendation =
+                        momentaCore.recommend(CURRENT_USER_ID);
                 long activeGoals = goalService.getAllGoals(CURRENT_USER_ID).stream()
                         .filter(g -> "ACTIVE".equals(g.getStatus())).count();
                 long activeProjects = projectService.getAllProjects(CURRENT_USER_ID).stream()
                         .filter(p -> "ACTIVE".equals(p.getStatus())).count();
-                return new DashboardData(incomplete.size(), recommended, (int) activeGoals, (int) activeProjects);
+                return new DashboardData(incompleteCount, recommendation, (int) activeGoals, (int) activeProjects);
             }
         };
 
@@ -93,8 +98,8 @@ public class DashboardController {
         goalCountLabel.setText(String.valueOf(data.activeGoals()));
         projectCountLabel.setText(String.valueOf(data.activeProjects()));
 
-        Task rec = data.recommendation();
-        if (rec == null) {
+        MomentaCore.Recommendation recommendation = data.recommendation();
+        if (recommendation == null) {
             nowTitleLabel.setText("Nothing pending — add a task to get started.");
             nowPriorityLabel.setText("");
             nowDeadlineLabel.setText("");
@@ -104,25 +109,23 @@ public class DashboardController {
             return;
         }
 
+        Task rec = recommendation.task();
         nowTitleLabel.setText(rec.getTitle());
-        nowPriorityLabel.setText("Priority: " + rec.getPriorityScore() + " / 100");
+        nowPriorityLabel.setText("Priority: " + recommendation.score() + " / 100");
         nowDeadlineLabel.setText(rec.getDeadline() == null || rec.getDeadline().isBlank()
                 ? "No deadline set" : "Deadline: " + rec.getDeadline());
-        nowReasonsLabel.setText(String.join("\n• ", buildReasonLines(rec)));
+
+        List<String> reasons = recommendation.reasons().isEmpty()
+                ? List.of("Standard priority")
+                : recommendation.reasons();
+        nowReasonsLabel.setText(String.join("\n• ", reasons));
         nowProgressBar.setProgress(rec.getProgress() / 100.0);
 
         // MOMENTA Pulse (simplified for Phase 1-4: productivity component only,
         // full multi-factor Pulse arrives with the Analytics phase, Section 17).
-        pulseLabel.setText(String.valueOf(rec.getPriorityScore()));
+        pulseLabel.setText(String.valueOf(recommendation.score()));
 
         fadeIn(nowTitleLabel);
-    }
-
-    private List<String> buildReasonLines(Task rec) {
-        var result = com.momenta.engine.PriorityEngine.score(rec);
-        return result.getReasons().isEmpty()
-                ? List.of("Standard priority")
-                : result.getReasons();
     }
 
     private void fadeIn(javafx.scene.Node node) {
@@ -187,7 +190,10 @@ public class DashboardController {
 
 
     /** Simple carrier record for the background load result. */
-    private record DashboardData(int incompleteCount, Task recommendation,
-                                 int activeGoals, int activeProjects) {
+    private record DashboardData(
+            int incompleteCount,
+            MomentaCore.Recommendation recommendation,
+            int activeGoals,
+            int activeProjects) {
     }
 }

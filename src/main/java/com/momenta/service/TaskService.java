@@ -7,7 +7,6 @@ import com.momenta.model.Task;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -63,16 +62,5 @@ public class TaskService {
         task.setPriorityScore(result.getScore());
     }
 
-    /**
-     * MOMENTA NOW (Section 16): ranks all incomplete tasks by priority score
-     * and returns the single best candidate to focus on right now, or null
-     * if there is nothing incomplete.
-     */
-    public Task getMomentaNowRecommendation(int userId) {
-        List<Task> incomplete = getIncompleteTasks(userId);
-        incomplete.forEach(this::recalculatePriority);
-        return incomplete.stream()
-                .max(Comparator.comparingInt(Task::getPriorityScore))
-                .orElse(null);
-    }
+
 }
