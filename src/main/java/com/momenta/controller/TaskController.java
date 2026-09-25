@@ -1,6 +1,10 @@
 package com.momenta.controller;
 
+import com.momenta.model.Goal;
+import com.momenta.model.Project;
 import com.momenta.model.Task;
+import com.momenta.service.GoalService;
+import com.momenta.service.ProjectService;
 import com.momenta.service.TaskService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
@@ -34,7 +38,11 @@ public class TaskController {
     @FXML private TableColumn<Task, String> statusColumn;
 
     private final TaskService taskService = new TaskService();
+    private final GoalService goalService = new GoalService();
+    private final ProjectService projectService = new ProjectService();
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
+    private final ObservableList<Goal> availableGoals = FXCollections.observableArrayList();
+    private final ObservableList<Project> availableProjects = FXCollections.observableArrayList();
     private static final int CURRENT_USER_ID = 1;
 
     private static final List<String> CATEGORIES =
@@ -55,14 +63,27 @@ public class TaskController {
 
     /** Background load, same JavaFX Task pattern as DashboardController. */
     private void loadTasks() {
-        javafx.concurrent.Task<List<Task>> loadTask = new javafx.concurrent.Task<>() {
+        javafx.concurrent.Task<Object[]> loadTask = new javafx.concurrent.Task<>() {
             @Override
-            protected List<Task> call() {
-                return taskService.getAllTasks(CURRENT_USER_ID);
+            protected Object[] call() {
+                List<Task> taskList = taskService.getAllTasks(CURRENT_USER_ID);
+                List<Goal> goals = goalService.getAllGoals(CURRENT_USER_ID);
+                List<Project> projectList = projectService.getAllProjects(CURRENT_USER_ID);
+                return new Object[]{taskList, goals, projectList};
             }
         };
         loadTask.setOnSucceeded(e -> {
-            tasks.setAll(loadTask.getValue());
+            Object[] result = loadTask.getValue();
+            @SuppressWarnings("unchecked")
+            List<Task> taskList = (List<Task>) result[0];
+            @SuppressWarnings("unchecked")
+            List<Goal> goals = (List<Goal>) result[1];
+            @SuppressWarnings("unchecked")
+            List<Project> projectList = (List<Project>) result[2];
+
+            tasks.setAll(taskList);
+            availableGoals.setAll(goals);
+            availableProjects.setAll(projectList);
         });
         loadTask.setOnFailed(e ->
                 AlertUtil.showError("Load failed", "Could not load tasks from the database.",
@@ -76,7 +97,12 @@ public class TaskController {
         Optional<Task> result = showTaskDialog(null);
         result.ifPresent(task -> runInBackground(
                 () -> taskService.createTask(task),
-                saved -> tasks.add(0, saved)
+                saved -> {
+                    tasks.add(0, saved);
+                    SceneManager.getInstance().invalidate("Dashboard");
+                    SceneManager.getInstance().invalidate("Goals");
+                    SceneManager.getInstance().invalidate("Projects");
+                }
         ));
     }
 
@@ -90,7 +116,12 @@ public class TaskController {
         Optional<Task> result = showTaskDialog(selected);
         result.ifPresent(task -> runInBackground(
                 () -> { taskService.updateTask(task); return task; },
-                updated -> taskTable.refresh()
+                updated -> {
+                    taskTable.refresh();
+                    SceneManager.getInstance().invalidate("Dashboard");
+                    SceneManager.getInstance().invalidate("Goals");
+                    SceneManager.getInstance().invalidate("Projects");
+                }
         ));
     }
 
@@ -105,9 +136,12 @@ public class TaskController {
                 () -> { taskService.completeTask(selected); return selected; },
                 t -> {
                     taskTable.refresh();
-                    // The Dashboard's MOMENTA NOW / task counts depend on this
-                    // task's status, so force it to reload next time it's shown.
+                    // Goal/Project progress and Dashboard's MOMENTA NOW / task
+                    // counts all depend on this task's status, so force them
+                    // to reload next time they're opened.
                     SceneManager.getInstance().invalidate("Dashboard");
+                    SceneManager.getInstance().invalidate("Goals");
+                    SceneManager.getInstance().invalidate("Projects");
                 }
         );
     }
@@ -127,6 +161,8 @@ public class TaskController {
                 deleted -> {
                     tasks.remove(deleted);
                     SceneManager.getInstance().invalidate("Dashboard");
+                    SceneManager.getInstance().invalidate("Goals");
+                    SceneManager.getInstance().invalidate("Projects");
                 }
         );
     }
@@ -187,6 +223,20 @@ public class TaskController {
 
         Spinner<Integer> progressSpinner = new Spinner<>(0, 100, isEdit ? existing.getProgress() : 0, 5);
 
+        ComboBox<Project> projectBox = new ComboBox<>(FXCollections.observableArrayList(availableProjects));
+        projectBox.setPromptText("No project");
+        if (isEdit && existing.getProjectId() != null) {
+            availableProjects.stream().filter(p -> p.getId() == existing.getProjectId())
+                    .findFirst().ifPresent(projectBox::setValue);
+        }
+
+        ComboBox<Goal> goalBox = new ComboBox<>(FXCollections.observableArrayList(availableGoals));
+        goalBox.setPromptText("No goal");
+        if (isEdit && existing.getGoalId() != null) {
+            availableGoals.stream().filter(g -> g.getId() == existing.getGoalId())
+                    .findFirst().ifPresent(goalBox::setValue);
+        }
+
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -197,6 +247,8 @@ public class TaskController {
         grid.addRow(4, new Label("Deadline"), deadlinePicker);
         grid.addRow(5, new Label("Estimated minutes"), minutesSpinner);
         grid.addRow(6, new Label("Progress (%)"), progressSpinner);
+        grid.addRow(7, new Label("Project"), projectBox);
+        grid.addRow(8, new Label("Goal"), goalBox);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -214,6 +266,8 @@ public class TaskController {
             task.setDeadline(deadlinePicker.getValue() == null ? "" : deadlinePicker.getValue().toString());
             task.setEstimatedMinutes(minutesSpinner.getValue());
             task.setProgress(progressSpinner.getValue());
+            task.setProjectId(projectBox.getValue() == null ? null : projectBox.getValue().getId());
+            task.setGoalId(goalBox.getValue() == null ? null : goalBox.getValue().getId());
             if (!isEdit) {
                 task.setStatus("PENDING");
             } else if (task.getProgress() == 100) {

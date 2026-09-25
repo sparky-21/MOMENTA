@@ -1,9 +1,29 @@
-# MOMENTA — Personal Operating System (Phase 1–4)
+# MOMENTA — Personal Operating System (Phase 1–5)
 
 This is the foundation build: project skeleton, MVC + DAO wiring, the full
-SQLite schema for every module in the spec, and one complete vertical
-slice — **Task Management**, wired all the way from FXML through to SQL and
-back, with the **MOMENTA NOW** priority recommendation running on top of it.
+SQLite schema for every module in the spec, **Task Management** wired all
+the way from FXML through to SQL and back with the **MOMENTA NOW** priority
+recommendation on top, and now **Goals + Projects** (Phase 5).
+
+## What's new in Phase 5
+
+- **Goals** (`model/Goal.java`, `dao/GoalDAO(+Impl).java`, `service/GoalService.java`,
+  `controller/GoalController.java`, `view/Goals.fxml`): hierarchical via
+  `parentGoalId` (Life Goal → Year Goal → Monthly Goal...). Progress is
+  **not** typed in by hand — `GoalService.recalculateProgress()` derives it
+  from the completion % of tasks linked to that goal (§7).
+- **Projects** (`model/Project.java`, `dao/ProjectDAO(+Impl).java`,
+  `service/ProjectService.java`, `controller/ProjectController.java`,
+  `view/Projects.fxml`): optionally linked to a Goal. Progress is computed
+  **live** on every load from linked tasks — never stored, so it can't go
+  stale (§8 — "calculated dynamically" taken literally: the `projects`
+  table has no `progress` column at all).
+- **Task ↔ Goal/Project linkage**: the task dialog (`TaskController`) now
+  has Project and Goal dropdowns. Creating/completing/deleting a task
+  invalidates the Dashboard, Goals, and Projects views so their numbers
+  are never stale the next time you open them.
+- **Dashboard**: two new cards (Active Goals, Active Projects), and Goals /
+  Projects sidebar buttons are now enabled.
 
 ## What's included (Phases 1–4)
 
@@ -67,7 +87,6 @@ Java. Layout and visual structure come entirely from `BorderPane` /
 
 Following the phases in the spec (§37), the next builds are:
 
-- **Phase 5**: Goals + Projects (hierarchical goals, project progress)
 - **Phase 6**: Calendar + Events
 - **Phase 7–8**: Habits, Finance
 - **Phase 9**: Focus Mode (Timeline-based countdown, session logging)

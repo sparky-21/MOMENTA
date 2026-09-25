@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.momenta.controller.GoalController">
+
+    <top>
+        <VBox spacing="10">
+            <padding><Insets top="20" right="24" bottom="10" left="24"/></padding>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="← Dashboard" onAction="#onBackToDashboard"/>
+                <Label text="Goals">
+                    <font><Font name="System Bold" size="24"/></font>
+                </Label>
+            </HBox>
+
+            <Label text="Life Goal → Year Goal → Monthly Goal → Project — set a Parent goal to nest one under another."
+                   wrapText="true"/>
+
+            <HBox spacing="10">
+                <Button text="Add Goal" onAction="#onAddGoal"/>
+                <Button text="Edit" onAction="#onEditGoal"/>
+                <Button text="Delete" onAction="#onDeleteGoal"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="goalTable">
+            <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
+            <columns>
+                <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
+                <TableColumn fx:id="parentColumn" text="Parent Goal" prefWidth="160"/>
+                <TableColumn fx:id="deadlineColumn" text="Deadline" prefWidth="110"/>
+                <TableColumn fx:id="progressColumn" text="Progress %" prefWidth="100"/>
+                <TableColumn fx:id="importanceColumn" text="Importance" prefWidth="90"/>
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="110"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

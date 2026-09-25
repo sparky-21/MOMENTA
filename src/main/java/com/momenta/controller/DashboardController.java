@@ -1,6 +1,8 @@
 package com.momenta.controller;
 
 import com.momenta.model.Task;
+import com.momenta.service.GoalService;
+import com.momenta.service.ProjectService;
 import com.momenta.service.TaskService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.SceneManager;
@@ -39,6 +41,8 @@ public class DashboardController {
 
     @FXML private Label greetingLabel;
     @FXML private Label taskCountLabel;
+    @FXML private Label goalCountLabel;
+    @FXML private Label projectCountLabel;
     @FXML private Label pulseLabel;
 
     @FXML private Label nowTitleLabel;
@@ -48,6 +52,8 @@ public class DashboardController {
     @FXML private ProgressBar nowProgressBar;
 
     private final TaskService taskService = new TaskService();
+    private final GoalService goalService = new GoalService();
+    private final ProjectService projectService = new ProjectService();
     private static final int CURRENT_USER_ID = 1; // single-user for now (Phase 1-4)
 
     @FXML
@@ -67,7 +73,11 @@ public class DashboardController {
             protected DashboardData call() {
                 List<Task> incomplete = taskService.getIncompleteTasks(CURRENT_USER_ID);
                 Task recommended = taskService.getMomentaNowRecommendation(CURRENT_USER_ID);
-                return new DashboardData(incomplete.size(), recommended);
+                long activeGoals = goalService.getAllGoals(CURRENT_USER_ID).stream()
+                        .filter(g -> "ACTIVE".equals(g.getStatus())).count();
+                long activeProjects = projectService.getAllProjects(CURRENT_USER_ID).stream()
+                        .filter(p -> "ACTIVE".equals(p.getStatus())).count();
+                return new DashboardData(incomplete.size(), recommended, (int) activeGoals, (int) activeProjects);
             }
         };
 
@@ -80,6 +90,8 @@ public class DashboardController {
 
     private void applyDashboardData(DashboardData data) {
         taskCountLabel.setText(String.valueOf(data.incompleteCount()));
+        goalCountLabel.setText(String.valueOf(data.activeGoals()));
+        projectCountLabel.setText(String.valueOf(data.activeProjects()));
 
         Task rec = data.recommendation();
         if (rec == null) {
@@ -127,6 +139,18 @@ public class DashboardController {
     }
 
     @FXML
+    private void onOpenGoals() {
+        SceneManager.getInstance().invalidate("Goals");
+        SceneManager.getInstance().switchTo("Goals");
+    }
+
+    @FXML
+    private void onOpenProjects() {
+        SceneManager.getInstance().invalidate("Projects");
+        SceneManager.getInstance().switchTo("Projects");
+    }
+
+    @FXML
     private void onRefresh() {
         loadDashboardData();
     }
@@ -139,6 +163,7 @@ public class DashboardController {
     }
 
     /** Simple carrier record for the background load result. */
-    private record DashboardData(int incompleteCount, Task recommendation) {
+    private record DashboardData(int incompleteCount, Task recommendation,
+                                  int activeGoals, int activeProjects) {
     }
 }

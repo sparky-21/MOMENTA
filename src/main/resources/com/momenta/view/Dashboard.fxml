@@ -30,8 +30,8 @@
 
             <Button text="Overview" maxWidth="Infinity"/>
             <Button text="Tasks" maxWidth="Infinity" onAction="#onOpenTasks"/>
-            <Button text="Goals" maxWidth="Infinity" disable="true"/>
-            <Button text="Projects" maxWidth="Infinity" disable="true"/>
+            <Button text="Goals" maxWidth="Infinity" onAction="#onOpenGoals"/>
+            <Button text="Projects" maxWidth="Infinity" onAction="#onOpenProjects"/>
             <Button text="Calendar" maxWidth="Infinity" disable="true"/>
             <Button text="Habits" maxWidth="Infinity" disable="true"/>
             <Button text="Finance" maxWidth="Infinity" disable="true"/>
@@ -67,6 +67,18 @@
 
                 <TitledPane text="INCOMPLETE TASKS" collapsible="false" prefWidth="220">
                     <Label fx:id="taskCountLabel" text="0">
+                        <font><Font name="System Bold" size="28"/></font>
+                    </Label>
+                </TitledPane>
+
+                <TitledPane text="ACTIVE GOALS" collapsible="false" prefWidth="220">
+                    <Label fx:id="goalCountLabel" text="0">
+                        <font><Font name="System Bold" size="28"/></font>
+                    </Label>
+                </TitledPane>
+
+                <TitledPane text="ACTIVE PROJECTS" collapsible="false" prefWidth="220">
+                    <Label fx:id="projectCountLabel" text="0">
                         <font><Font name="System Bold" size="28"/></font>
                     </Label>
                 </TitledPane>
