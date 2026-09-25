@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.momenta.controller.DashboardController">
+
+    <!-- ================= SIDEBAR ================= -->
+    <left>
+        <VBox spacing="6" prefWidth="200">
+            <padding><Insets top="20" right="12" bottom="20" left="12"/></padding>
+
+            <Label text="MOMENTA">
+                <font><Font name="System Bold" size="22"/></font>
+            </Label>
+            <Label text="Personal Operating System" wrapText="true"/>
+
+            <Separator/>
+
+            <Button text="Overview" maxWidth="Infinity"/>
+            <Button text="Tasks" maxWidth="Infinity" onAction="#onOpenTasks"/>
+            <Button text="Goals" maxWidth="Infinity" disable="true"/>
+            <Button text="Projects" maxWidth="Infinity" disable="true"/>
+            <Button text="Calendar" maxWidth="Infinity" disable="true"/>
+            <Button text="Habits" maxWidth="Infinity" disable="true"/>
+            <Button text="Finance" maxWidth="Infinity" disable="true"/>
+            <Button text="Focus" maxWidth="Infinity" disable="true"/>
+            <Button text="Analytics" maxWidth="Infinity" disable="true"/>
+
+            <Separator/>
+            <Button text="Settings" maxWidth="Infinity" disable="true"/>
+        </VBox>
+    </left>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <center>
+        <VBox spacing="18">
+            <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="greetingLabel" text="Good afternoon">
+                    <font><Font name="System Bold" size="26"/></font>
+                </Label>
+                <Button text="Refresh" onAction="#onRefresh"/>
+            </HBox>
+
+            <Separator/>
+
+            <!-- Stat cards row -->
+            <HBox spacing="16">
+                <TitledPane text="MOMENTA PULSE" collapsible="false" prefWidth="220">
+                    <Label fx:id="pulseLabel" text="—">
+                        <font><Font name="System Bold" size="28"/></font>
+                    </Label>
+                </TitledPane>
+
+                <TitledPane text="INCOMPLETE TASKS" collapsible="false" prefWidth="220">
+                    <Label fx:id="taskCountLabel" text="0">
+                        <font><Font name="System Bold" size="28"/></font>
+                    </Label>
+                </TitledPane>
+            </HBox>
+
+            <Separator/>
+
+            <!-- MOMENTA NOW -->
+            <TitledPane text="MOMENTA NOW ⚡" collapsible="false">
+                <VBox spacing="8">
+                    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+                    <Label fx:id="nowTitleLabel" text="Loading...">
+                        <font><Font name="System Bold" size="20"/></font>
+                    </Label>
+                    <Label fx:id="nowPriorityLabel" text=""/>
+                    <Label fx:id="nowDeadlineLabel" text=""/>
+                    <ProgressBar fx:id="nowProgressBar" progress="0" prefWidth="300"/>
+
+                    <Label text="Why?">
+                        <font><Font name="System Bold" size="13"/></font>
+                    </Label>
+                    <Label fx:id="nowReasonsLabel" text="" wrapText="true"/>
+
+                    <Button text="Open Tasks" onAction="#onOpenTasks"/>
+                </VBox>
+            </TitledPane>
+        </VBox>
+    </center>
+</BorderPane>
