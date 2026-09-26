@@ -34,6 +34,11 @@ public class LoginController {
     }
 
     @FXML
+    private void onHome() {
+        SceneManager.getInstance().switchTo("Home");
+    }
+
+    @FXML
     private void onRegister() {
         SceneManager.getInstance().switchTo("Register");
     }

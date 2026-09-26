@@ -16,7 +16,7 @@ public class Main extends Application {
         DatabaseInitializer.initialize();
 
         SceneManager.getInstance().init(primaryStage);
-        SceneManager.getInstance().switchTo("Login");
+        SceneManager.getInstance().switchTo("Home");
 
         primaryStage.setTitle("MOMENTA — Personal Operating System");
         primaryStage.setMinWidth(900);

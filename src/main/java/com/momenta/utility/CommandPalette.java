@@ -87,6 +87,7 @@ public final class CommandPalette {
         pane.setContent(content);
         pane.getButtonTypes().clear();
         pane.setHeaderText("What do you want to do?");
+        MomentaTheme.styleDialog(pane);
 
         Runnable executeSelected = () -> {
             Command selected = list.getSelectionModel().getSelectedItem();

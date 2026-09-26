@@ -34,6 +34,7 @@ public final class AlertUtil {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(userMessage);
+        MomentaTheme.styleDialog(alert.getDialogPane());
         alert.showAndWait();
     }
 
@@ -42,6 +43,7 @@ public final class AlertUtil {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        MomentaTheme.styleDialog(alert.getDialogPane());
         alert.showAndWait();
     }
 
@@ -50,6 +52,7 @@ public final class AlertUtil {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        MomentaTheme.styleDialog(alert.getDialogPane());
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
     }

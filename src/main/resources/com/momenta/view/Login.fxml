@@ -14,7 +14,7 @@
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.momenta.controller.LoginController">
     <AnchorPane maxWidth="Infinity" maxHeight="Infinity"/>
-    <VBox alignment="CENTER" spacing="14" maxWidth="430" minWidth="300">
+    <VBox fx:id="loginCard" alignment="CENTER" spacing="14" maxWidth="430" minWidth="300">
         <padding><Insets top="36" right="42" bottom="36" left="42"/></padding>
         <Label text="MOMENTA">
             <font><Font name="System Bold" size="36"/></font>
@@ -25,5 +25,6 @@
         <PasswordField fx:id="passwordField" promptText="Password" maxWidth="Infinity"/>
         <Button text="LOGIN" maxWidth="Infinity" onAction="#onLogin"/>
         <Button text="Create an account" maxWidth="Infinity" onAction="#onRegister"/>
+        <Button text="← Back to home" maxWidth="Infinity" onAction="#onHome"/>
     </VBox>
 </StackPane>

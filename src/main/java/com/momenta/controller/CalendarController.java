@@ -985,6 +985,8 @@ public class CalendarController {
         dialog.getDialogPane()
                 .setContent(form);
 
+        com.momenta.utility.MomentaTheme.styleDialog(dialog.getDialogPane());
+
 
         // -----------------------------------------------------
         // RESULT CONVERTER

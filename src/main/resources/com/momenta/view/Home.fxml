@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="homeRoot" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.momenta.controller.HomeController">
+    <top>
+        <HBox fx:id="homeNav" alignment="CENTER_LEFT" spacing="14">
+            <padding><Insets top="22" right="42" bottom="18" left="42"/></padding>
+            <Label text="MOMENTA" fx:id="brandLabel">
+                <font><Font name="System Bold" size="25"/></font>
+            </Label>
+            <Label text="PERSONAL OPERATING SYSTEM" fx:id="brandSub"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Log in" onAction="#onLogin" fx:id="navLogin"/>
+            <Button text="Get started" onAction="#onRegister" fx:id="navStart"/>
+        </HBox>
+    </top>
+
+    <center>
+        <StackPane fx:id="heroArea">
+            <padding><Insets top="20" right="42" bottom="36" left="42"/></padding>
+            <VBox fx:id="heroContent" alignment="CENTER" spacing="20" maxWidth="1050">
+                <Label text="YOUR LIFE.
+COMPILED." fx:id="heroTitle" wrapText="true" textAlignment="CENTER">
+                    <font><Font name="System Bold" size="56"/></font>
+                </Label>
+                <Label text="A calm, intelligent workspace for tasks, goals, habits, projects, focus and everything that moves you forward."
+                       fx:id="heroSubtitle" wrapText="true" maxWidth="760" textAlignment="CENTER"/>
+                <HBox alignment="CENTER" spacing="14">
+                    <Button text="Start with MOMENTA  →" onAction="#onRegister" fx:id="heroStart"/>
+                    <Button text="I already have an account" onAction="#onLogin" fx:id="heroLogin"/>
+                </HBox>
+
+                <HBox fx:id="featureRow" alignment="CENTER" spacing="14" maxWidth="1100">
+                    <VBox fx:id="featureTasks" alignment="CENTER_LEFT" spacing="7" prefWidth="165" minHeight="120">
+                        <Label text="✓  TASKS"/>
+                        <Label text="Turn intentions into clear next actions." wrapText="true"/>
+                    </VBox>
+                    <VBox fx:id="featureGoals" alignment="CENTER_LEFT" spacing="7" prefWidth="165" minHeight="120">
+                        <Label text="◎  GOALS"/>
+                        <Label text="Keep long-term progress visible." wrapText="true"/>
+                    </VBox>
+                    <VBox fx:id="featureFocus" alignment="CENTER_LEFT" spacing="7" prefWidth="165" minHeight="120">
+                        <Label text="◉  FOCUS"/>
+                        <Label text="Protect deep-work time when it matters." wrapText="true"/>
+                    </VBox>
+                    <VBox fx:id="featureAnalytics" alignment="CENTER_LEFT" spacing="7" prefWidth="165" minHeight="120">
+                        <Label text="◌  INSIGHTS"/>
+                        <Label text="See patterns without drowning in data." wrapText="true"/>
+                    </VBox>
+                    <VBox fx:id="featureLife" alignment="CENTER_LEFT" spacing="7" prefWidth="165" minHeight="120">
+                        <Label text="✦  LIFE"/>
+                        <Label text="Habits, finance, projects and more." wrapText="true"/>
+                    </VBox>
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="8">
+                    <Label text="PRIVATE BY DESIGN" fx:id="privacyPill"/>
+                    <Label text="•"/>
+                    <Label text="LOCAL SQLITE"/>
+                    <Label text="•"/>
+                    <Label text="BUILT FOR MOMENTUM"/>
+                </HBox>
+            </VBox>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER">
+            <padding><Insets top="10" right="20" bottom="20" left="20"/></padding>
+            <Label text="MOMENTA  ·  Organize. Focus. Accomplish." fx:id="footerLabel"/>
+        </HBox>
+    </bottom>
+</BorderPane>

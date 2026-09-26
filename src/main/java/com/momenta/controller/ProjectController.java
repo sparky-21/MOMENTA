@@ -182,6 +182,7 @@ public class ProjectController {
         grid.addRow(4, new Label("Status"), statusBox);
 
         dialog.getDialogPane().setContent(grid);
+        com.momenta.utility.MomentaTheme.styleDialog(dialog.getDialogPane());
 
         dialog.setResultConverter(buttonType -> {
             if (buttonType != ButtonType.OK) return null;

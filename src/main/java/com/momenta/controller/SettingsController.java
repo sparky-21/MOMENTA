@@ -28,7 +28,7 @@ public class SettingsController {
                 : "Personal settings");
 
         themeBox.getItems().setAll("Light", "Dark");
-        accentBox.getItems().setAll("Sea Green", "Sky Blue", "Lavender", "Soft Green", "Peach", "Pink", "Periwinkle");
+        accentBox.getItems().setAll("Royal Purple", "Electric Violet", "Plum", "Sea Green", "Sky Blue", "Lavender", "Soft Green", "Peach", "Pink", "Periwinkle");
         landingViewBox.getItems().setAll("Dashboard", "Tasks", "Goals", "Projects", "Calendar", "Habits", "Finance", "Focus", "Analytics");
 
         themeBox.setValue(SettingsService.getTheme());

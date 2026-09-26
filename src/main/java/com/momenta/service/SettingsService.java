@@ -26,11 +26,11 @@ public final class SettingsService {
         return Preferences.userRoot().node(NODE).node(userKey);
     }
 
-    public static String getTheme() { return prefs().get(THEME, "Light"); }
-    public static void setTheme(String value) { prefs().put(THEME, value == null ? "Light" : value); }
+    public static String getTheme() { return prefs().get(THEME, "Dark"); }
+    public static void setTheme(String value) { prefs().put(THEME, value == null ? "Dark" : value); }
 
-    public static String getAccent() { return prefs().get(ACCENT, "Sea Green"); }
-    public static void setAccent(String value) { prefs().put(ACCENT, value == null ? "Sea Green" : value); }
+    public static String getAccent() { return prefs().get(ACCENT, "Royal Purple"); }
+    public static void setAccent(String value) { prefs().put(ACCENT, value == null ? "Royal Purple" : value); }
 
     public static double getFontScale() { return prefs().getDouble(FONT_SCALE, 1.0); }
     public static void setFontScale(double value) { prefs().putDouble(FONT_SCALE, clamp(value, 0.85, 1.25)); }
@@ -46,8 +46,8 @@ public final class SettingsService {
 
     public static void resetDefaults() {
         Preferences p = prefs();
-        p.put(THEME, "Light");
-        p.put(ACCENT, "Sea Green");
+        p.put(THEME, "Dark");
+        p.put(ACCENT, "Royal Purple");
         p.putDouble(FONT_SCALE, 1.0);
         p.putBoolean(ANIMATIONS, true);
         p.putBoolean(COMPACT, false);

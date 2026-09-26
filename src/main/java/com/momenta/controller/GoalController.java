@@ -186,6 +186,7 @@ public class GoalController {
         grid.addRow(5, new Label("Status"), statusBox);
 
         dialog.getDialogPane().setContent(grid);
+        com.momenta.utility.MomentaTheme.styleDialog(dialog.getDialogPane());
 
         dialog.setResultConverter(buttonType -> {
             if (buttonType != ButtonType.OK) return null;

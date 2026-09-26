@@ -76,7 +76,7 @@ public class HabitController {
     private Optional<Habit> showDialog(Habit existing){
         boolean edit=existing!=null; Dialog<Habit> dialog=new Dialog<>();dialog.setTitle(edit?"Edit Habit":"New Habit");dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK,ButtonType.CANCEL);
         TextField name=new TextField(edit?existing.getName():"");name.setPromptText("e.g. Read 20 minutes");
-        GridPane grid=new GridPane();grid.setHgap(10);grid.setVgap(10);grid.addRow(0,new Label("Name"),name);dialog.getDialogPane().setContent(grid);
+        GridPane grid=new GridPane();grid.setHgap(10);grid.setVgap(10);grid.addRow(0,new Label("Name"),name);dialog.getDialogPane().setContent(grid);com.momenta.utility.MomentaTheme.styleDialog(dialog.getDialogPane());
         dialog.setResultConverter(b->{if(b!=ButtonType.OK)return null;if(name.getText().isBlank()){AlertUtil.showInfo("Name required","Enter a habit name.");return null;}Habit h=edit?existing:new Habit();h.setUserId(CurrentUser.getId());h.setName(name.getText().trim());return h;});
         return dialog.showAndWait();
     }

@@ -251,6 +251,7 @@ public class TaskController {
         grid.addRow(8, new Label("Goal"), goalBox);
 
         dialog.getDialogPane().setContent(grid);
+        com.momenta.utility.MomentaTheme.styleDialog(dialog.getDialogPane());
 
         dialog.setResultConverter(buttonType -> {
             if (buttonType != ButtonType.OK) return null;

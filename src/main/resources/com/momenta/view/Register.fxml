@@ -18,7 +18,7 @@
     <AnchorPane maxWidth="Infinity" maxHeight="Infinity"/>
     <ScrollPane fitToWidth="true" pannable="true" maxWidth="520" maxHeight="Infinity" hbarPolicy="NEVER">
         <content>
-            <VBox alignment="CENTER" spacing="12" maxWidth="450">
+            <VBox fx:id="registerCard" alignment="CENTER" spacing="12" maxWidth="450">
                 <padding><Insets top="35" right="40" bottom="35" left="40"/></padding>
                 <Label text="Create your MOMENTA account" wrapText="true">
                     <font><Font name="System Bold" size="24"/></font>
