@@ -17,16 +17,19 @@
 
     <top>
         <VBox id="workspaceHeader" spacing="10" fillWidth="true">
-            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
-            <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding><Insets top="18" right="24" bottom="14" left="24"/></padding>
+            <HBox spacing="12" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
-                <Label text="Goals">
-                    <font><Font name="System Bold" size="24"/></font>
-                </Label>
+                <VBox spacing="2">
+                    <Label id="moduleKicker" text="GOALS • LONG-TERM DIRECTION"/>
+                    <Label id="pageTitle" text="Goals">
+                        <font><Font name="System Bold" size="24"/></font>
+                    </Label>
+                </VBox>
             </HBox>
-            <Label text="Life Goal → Year Goal → Monthly Goal → Project — set a Parent goal to nest one under another."
+            <Label id="pageSubtitle" text="Life Goal → Year Goal → Monthly Goal → Project — keep the bigger picture measurable."
                    wrapText="true" maxWidth="Infinity"/>
-            <FlowPane hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity">
+            <FlowPane id="actionBar" hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity">
                 <Button text="Add Goal" onAction="#onAddGoal"/>
                 <Button text="Edit" onAction="#onEditGoal"/>
                 <Button text="Delete" onAction="#onDeleteGoal"/>
@@ -35,9 +38,9 @@
     </top>
 
     <center>
-        <VBox id="workspaceBody" fillWidth="true">
-            <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
-            <TableView fx:id="goalTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+        <VBox id="workspaceBody" fillWidth="true" spacing="10">
+            <padding><Insets top="14" right="24" bottom="20" left="24"/></padding>
+            <TableView id="workspaceTable" fx:id="goalTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
                 <columns>
                     <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
                     <TableColumn fx:id="parentColumn" text="Parent Goal" prefWidth="160"/>

@@ -17,16 +17,19 @@
 
     <top>
         <VBox id="workspaceHeader" spacing="10" fillWidth="true">
-            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
-            <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding><Insets top="18" right="24" bottom="14" left="24"/></padding>
+            <HBox spacing="12" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
-                <Label text="Projects">
-                    <font><Font name="System Bold" size="24"/></font>
-                </Label>
+                <VBox spacing="2">
+                    <Label id="moduleKicker" text="PROJECTS • EXECUTION SPACE"/>
+                    <Label id="pageTitle" text="Projects">
+                        <font><Font name="System Bold" size="24"/></font>
+                    </Label>
+                </VBox>
             </HBox>
-            <Label text="Progress here is calculated live from each project's linked tasks — it's never typed in by hand."
+            <Label id="pageSubtitle" text="Turn goals into visible progress through linked tasks — progress is calculated live."
                    wrapText="true" maxWidth="Infinity"/>
-            <FlowPane hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity">
+            <FlowPane id="actionBar" hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity">
                 <Button text="Add Project" onAction="#onAddProject"/>
                 <Button text="Edit" onAction="#onEditProject"/>
                 <Button text="Delete" onAction="#onDeleteProject"/>
@@ -35,9 +38,9 @@
     </top>
 
     <center>
-        <VBox id="workspaceBody" fillWidth="true">
-            <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
-            <TableView fx:id="projectTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+        <VBox id="workspaceBody" fillWidth="true" spacing="10">
+            <padding><Insets top="14" right="24" bottom="20" left="24"/></padding>
+            <TableView id="workspaceTable" fx:id="projectTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
                 <columns>
                     <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
                     <TableColumn fx:id="goalColumn" text="Linked Goal" prefWidth="160"/>

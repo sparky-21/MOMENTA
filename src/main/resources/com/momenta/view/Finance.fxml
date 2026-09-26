@@ -9,7 +9,6 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -61,18 +60,12 @@
     <center>
         <ScrollPane id="workspaceBody" fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
             <content>
-                <GridPane hgap="16" vgap="16" maxWidth="Infinity">
+                <FlowPane hgap="16" vgap="16" prefWrapLength="980" maxWidth="Infinity">
                     <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
-                    <columnConstraints>
-                        <ColumnConstraints percentWidth="40" hgrow="ALWAYS" minWidth="320"/>
-                        <ColumnConstraints percentWidth="30" hgrow="ALWAYS" minWidth="260"/>
-                        <ColumnConstraints percentWidth="30" hgrow="ALWAYS" minWidth="240"/>
-                    </columnConstraints>
-                    <rowConstraints><RowConstraints vgrow="ALWAYS"/></rowConstraints>
 
-                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0" minHeight="420">
+                    <VBox spacing="8" minWidth="320" minHeight="420" prefWidth="520">
                         <Label text="Expenses"><font><Font name="System Bold" size="14"/></font></Label>
-                        <TableView fx:id="expenseTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+                        <TableView id="expenseTableSurface" fx:id="expenseTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
                             <columns>
                                 <TableColumn fx:id="expenseDateColumn" text="Date" prefWidth="90"/>
                                 <TableColumn fx:id="expenseCategoryColumn" text="Category" prefWidth="100"/>
@@ -82,9 +75,9 @@
                         </TableView>
                     </VBox>
 
-                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0" minHeight="420">
+                    <VBox spacing="8" minWidth="260" minHeight="420" prefWidth="360">
                         <Label text="Income"><font><Font name="System Bold" size="14"/></font></Label>
-                        <TableView fx:id="incomeTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+                        <TableView id="incomeTableSurface" fx:id="incomeTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
                             <columns>
                                 <TableColumn fx:id="incomeDateColumn" text="Date" prefWidth="100"/>
                                 <TableColumn fx:id="incomeSourceColumn" text="Source" prefWidth="100"/>
@@ -93,12 +86,12 @@
                         </TableView>
                     </VBox>
 
-                    <VBox spacing="8" GridPane.columnIndex="2" GridPane.rowIndex="0" minHeight="420">
+                    <VBox spacing="8" minWidth="240" minHeight="420" prefWidth="320">
                         <Label text="Spending by Category"><font><Font name="System Bold" size="14"/></font></Label>
-                        <PieChart fx:id="categoryChart" legendVisible="true" labelsVisible="true" VBox.vgrow="ALWAYS"
+                        <PieChart id="categoryChartSurface" fx:id="categoryChart" legendVisible="true" labelsVisible="true" VBox.vgrow="ALWAYS"
                                   minWidth="240" minHeight="360" maxWidth="Infinity"/>
                     </VBox>
-                </GridPane>
+                </FlowPane>
             </content>
         </ScrollPane>
     </center>

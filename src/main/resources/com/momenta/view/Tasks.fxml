@@ -17,14 +17,19 @@
 
     <top>
         <VBox id="workspaceHeader" spacing="10" fillWidth="true">
-            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
-            <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding><Insets top="18" right="24" bottom="14" left="24"/></padding>
+            <HBox spacing="12" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
-                <Label text="Tasks">
-                    <font><Font name="System Bold" size="24"/></font>
-                </Label>
+                <VBox spacing="2">
+                    <Label id="moduleKicker" text="TASKS • ACTION CENTER"/>
+                    <Label id="pageTitle" text="Tasks">
+                        <font><Font name="System Bold" size="24"/></font>
+                    </Label>
+                </VBox>
             </HBox>
-            <FlowPane hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity">
+            <Label id="pageSubtitle" text="Turn priorities into clear next actions and keep your workload moving."
+                   wrapText="true" maxWidth="Infinity"/>
+            <FlowPane id="actionBar" hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity">
                 <Button text="Add Task" onAction="#onAddTask"/>
                 <Button text="Edit" onAction="#onEditTask"/>
                 <Button text="Mark Complete" onAction="#onCompleteTask"/>
@@ -34,9 +39,9 @@
     </top>
 
     <center>
-        <VBox id="workspaceBody" fillWidth="true">
-            <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
-            <TableView fx:id="taskTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+        <VBox id="workspaceBody" fillWidth="true" spacing="10">
+            <padding><Insets top="14" right="24" bottom="20" left="24"/></padding>
+            <TableView id="workspaceTable" fx:id="taskTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
                 <columns>
                     <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
                     <TableColumn fx:id="categoryColumn" text="Category" prefWidth="110"/>

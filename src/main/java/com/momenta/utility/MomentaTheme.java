@@ -14,6 +14,7 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import java.util.List;
 
 /**
@@ -275,12 +276,42 @@ public final class MomentaTheme {
         }
 
         styleDashboardList(findById(root, "notificationList"));
+        styleDashboardSurface(findById(root, "notificationsCard"), BORDER_SOFT);
+        styleDashboardHero(findById(root, "dashboardHero"));
+        styleDashboardSurface(findById(root, "gamificationCard"), HOT_ORCHID);
+        styleDashboardSurface(findById(root, "insightCard"), PERIWINKLE);
         styleHeroMetric(findById(root, "pulseCard"), ELECTRIC_VIOLET);
         styleHeroMetric(findById(root, "taskCard"), TASKS_ACCENT);
         styleHeroMetric(findById(root, "goalCard"), GOALS_ACCENT);
         styleHeroMetric(findById(root, "projectCard"), PROJECTS_ACCENT);
 
         // Strong metric labels.
+        Node status = findById(root, "dashboardStatus");
+        if (status instanceof Label label) {
+            label.setTextFill(SOFT_GREEN);
+            label.setFont(Font.font(FONT_BOLD, 9.5));
+        }
+
+        Node subtitle = findById(root, "dashboardSubtitle");
+        if (subtitle instanceof Label label) {
+            label.setTextFill(TEXT_2);
+            label.setFont(Font.font(FONT, 12.5));
+            label.setWrapText(true);
+        }
+
+        Node kicker = findById(root, "dashboardKicker");
+        if (kicker instanceof Label label) {
+            label.setTextFill(NEON_LILAC);
+            label.setFont(Font.font(FONT_BOLD, 10.5));
+            label.setEffect(glow(ROYAL_PURPLE, 6));
+        }
+
+        Node nowKicker = findById(root, "nowKicker");
+        if (nowKicker instanceof Label label) {
+            label.setTextFill(ROYAL_PURPLE);
+            label.setFont(Font.font(FONT_BOLD, 10));
+        }
+
         for (String id : new String[]{
                 "pulseLabel", "taskCountLabel", "goalCountLabel",
                 "projectCountLabel", "levelLabel", "xpLabel"
@@ -291,6 +322,22 @@ public final class MomentaTheme {
                 label.setFont(Font.font(FONT_BOLD, 25));
             }
         }
+    }
+
+    private static void styleDashboardHero(Node node) {
+        if (!(node instanceof Region region)) return;
+        region.setBackground(new Background(new BackgroundFill(
+                heroCardGradient(ROYAL_PURPLE), new CornerRadii(20), Insets.EMPTY)));
+        region.setBorder(border(ROYAL_PURPLE.deriveColor(0, 0.75, 1, 0.52), 1));
+        region.setPadding(new Insets(18, 20, 18, 20));
+        region.setEffect(softShadow(ROYAL_PURPLE));
+    }
+
+    private static void styleDashboardSurface(Node node, Color accent) {
+        if (!(node instanceof Region region)) return;
+        region.setBackground(background(SURFACE, 18));
+        region.setBorder(border(accent.deriveColor(0, 0.72, 1, 0.42), 1));
+        region.setEffect(softShadow(accent));
     }
 
     private static void styleNavButton(Button button, Color itemAccent) {
@@ -707,25 +754,7 @@ public final class MomentaTheme {
             }
         }
 
-        for (Node node : parent.lookupAll(".chart-plot-background")) {
-            node.setStyle("-fx-background-color: " + hex(SURFACE) + ";");
-        }
-
-        for (Node node : parent.lookupAll(".chart-vertical-grid-lines")) {
-            node.setStyle("-fx-stroke: " + hex(BORDER_SOFT) + ";");
-        }
-
-        for (Node node : parent.lookupAll(".chart-horizontal-grid-lines")) {
-            node.setStyle("-fx-stroke: " + hex(BORDER_SOFT) + ";");
-        }
-
-        for (Node node : parent.lookupAll(".chart-legend")) {
-            node.setStyle("-fx-background-color: " + hex(SURFACE_2) + ";");
-        }
-
-        for (Node node : parent.lookupAll(".chart-pie-label")) {
-            if (node instanceof Label label) label.setTextFill(TEXT_2);
-        }
+        stylePremiumCharts(parent, accent);
 
         for (Node node : parent.lookupAll(".spinner")) {
             node.setStyle(
@@ -734,6 +763,68 @@ public final class MomentaTheme {
                     "-fx-border-radius: 10;" +
                     "-fx-background-radius: 10;"
             );
+        }
+    }
+
+    private static void stylePremiumCharts(Parent parent, Color accent) {
+        for (Node node : parent.lookupAll(".chart")) {
+            node.setStyle(
+                    "-fx-background-color: " + hex(SURFACE) + ";" +
+                    "-fx-padding: 14;" +
+                    "-fx-border-color: " + hex(BORDER) + ";" +
+                    "-fx-border-width: 1;" +
+                    "-fx-border-radius: 16;" +
+                    "-fx-background-radius: 16;"
+            );
+        }
+        for (Node node : parent.lookupAll(".chart-plot-background")) {
+            node.setStyle("-fx-background-color: " + hex(SURFACE) + ";");
+        }
+        for (Node node : parent.lookupAll(".chart-vertical-grid-lines")) {
+            node.setStyle("-fx-stroke: " + hex(BORDER_SOFT) + "; -fx-stroke-dash-array: 2 5;");
+        }
+        for (Node node : parent.lookupAll(".chart-horizontal-grid-lines")) {
+            node.setStyle("-fx-stroke: " + hex(BORDER_SOFT) + "; -fx-stroke-dash-array: 2 5;");
+        }
+        for (Node node : parent.lookupAll(".axis")) {
+            node.setStyle("-fx-tick-label-fill: " + hex(MUTED) + "; -fx-tick-mark-stroke: " + hex(BORDER) + "; -fx-minor-tick-visible: false;");
+        }
+        for (Node node : parent.lookupAll(".axis-label")) {
+            if (node instanceof Label label) {
+                label.setTextFill(MUTED);
+                label.setFont(Font.font(FONT, 10.5));
+            }
+        }
+        for (Node node : parent.lookupAll(".chart-title")) {
+            if (node instanceof Label label) {
+                label.setTextFill(TEXT);
+                label.setFont(Font.font(FONT_BOLD, 15));
+            }
+        }
+        for (Node node : parent.lookupAll(".chart-legend")) {
+            node.setStyle("-fx-background-color: " + hex(SURFACE_2) + "; -fx-background-radius: 10; -fx-padding: 7;");
+        }
+        for (Node node : parent.lookupAll(".chart-legend-item")) {
+            if (node instanceof Labeled labeled) labeled.setTextFill(TEXT_2);
+        }
+        // PieChart labels are rendered as Text nodes, not JavaFX Label controls.
+        // Therefore setting Label.textFill alone does not affect the visible
+        // Food / Transport text on a dark chart background.
+        for (Node node : parent.lookupAll(".chart-pie-label")) {
+            if (node instanceof Text text) {
+                text.setFill(TEXT_2);
+                text.setFont(Font.font(FONT_BOLD, 11.5));
+            } else if (node instanceof Labeled labeled) {
+                labeled.setTextFill(TEXT_2);
+            }
+        }
+
+        // Make the connector lines visible as well.
+        for (Node node : parent.lookupAll(".chart-pie-label-line")) {
+            node.setStyle("-fx-stroke: " + hex(TEXT_2) + "; -fx-stroke-width: 1.1;");
+        }
+        for (Node node : parent.lookupAll(".chart-content")) {
+            node.setEffect(softShadow(accent));
         }
     }
 
@@ -855,38 +946,55 @@ public final class MomentaTheme {
     }
 
     private static void styleTaskWorkspace(Node root, Color accent) {
-        styleWorkspaceToolbar(root, TASKS_ACCENT, "TASKS", "Turn your next actions into momentum.");
+        styleWorkspaceToolbar(root, TASKS_ACCENT);
     }
 
     private static void styleGoalWorkspace(Node root, Color accent) {
-        styleWorkspaceToolbar(root, GOALS_ACCENT, "GOALS", "Keep the big picture visible and measurable.");
+        styleWorkspaceToolbar(root, GOALS_ACCENT);
     }
 
     private static void styleProjectWorkspace(Node root, Color accent) {
-        styleWorkspaceToolbar(root, PROJECTS_ACCENT, "PROJECTS", "Turn goals into progress you can see.");
+        styleWorkspaceToolbar(root, PROJECTS_ACCENT);
     }
 
-    private static void styleWorkspaceToolbar(Node root, Color accent, String kicker, String subtitle) {
+    private static void styleWorkspaceToolbar(Node root, Color accent) {
         if (!(root instanceof BorderPane pane)) return;
-        Node top = pane.getTop();
-        if (!(top instanceof Parent parent)) return;
 
-        boolean first = true;
-        for (Node node : parent.getChildrenUnmodifiable()) {
-            if (node instanceof Label label) {
-                if (first) {
-                    label.setTextFill(accent);
-                    label.setFont(Font.font(FONT_BOLD, 29));
-                    first = false;
-                }
-            }
+        Node kickerNode = findById(root, "moduleKicker");
+        if (kickerNode instanceof Label kicker) {
+            kicker.setTextFill(accent);
+            kicker.setFont(Font.font(FONT_BOLD, 10.5));
+            kicker.setOpacity(0.95);
         }
 
-        for (Node node : parent.lookupAll(".label")) {
-            if (node instanceof Label label && label.getText() != null &&
-                    label.getText().contains("Progress here")) {
-                label.setTextFill(MUTED);
-            }
+        Node titleNode = findById(root, "pageTitle");
+        if (titleNode instanceof Label title) {
+            title.setTextFill(TEXT);
+            title.setFont(Font.font(FONT_BOLD, 29));
+            title.setEffect(glow(accent, 7));
+        }
+
+        Node subtitleNode = findById(root, "pageSubtitle");
+        if (subtitleNode instanceof Label subtitle) {
+            subtitle.setTextFill(TEXT_2);
+            subtitle.setFont(Font.font(FONT, 12.5));
+        }
+
+        Node actionNode = findById(root, "actionBar");
+        if (actionNode instanceof Region actions) {
+            actions.setPadding(new Insets(4, 0, 2, 0));
+        }
+
+        Node tableNode = findById(root, "workspaceTable");
+        if (tableNode instanceof TableView<?> table) {
+            table.setEffect(softShadow(accent));
+            table.setBorder(border(accent.deriveColor(0, 0.72, 1, 0.62), 1.1));
+            table.setBackground(new Background(new BackgroundFill(
+                    cardGradient(accent), new CornerRadii(16), Insets.EMPTY)));
+        }
+
+        if (pane.getTop() instanceof Region header) {
+            header.setPadding(new Insets(18, 24, 16, 24));
         }
     }
 
@@ -1182,7 +1290,7 @@ public final class MomentaTheme {
         table.setMaxHeight(Double.MAX_VALUE);
         table.setBackground(background(SURFACE, 16));
         table.setBorder(border(BORDER, 1));
-        table.setPlaceholder(makePlaceholder());
+        table.setPlaceholder(makePlaceholder(table.getId()));
         table.setStyle(
                 "-fx-background-color: " + hex(SURFACE) + ";" +
                         "-fx-control-inner-background: " + hex(SURFACE) + ";" +
@@ -1224,10 +1332,21 @@ public final class MomentaTheme {
         });
     }
 
-    private static Label makePlaceholder() {
-        Label label = new Label("✦  Nothing here yet");
+    private static Label makePlaceholder(String id) {
+        String text = switch (id == null ? "" : id) {
+            case "taskTable" -> "✦  No tasks yet  •  add your first next action";
+            case "goalTable" -> "✦  No goals yet  •  define what matters next";
+            case "projectTable" -> "✦  No projects yet  •  turn a goal into progress";
+            case "habitTable" -> "✦  No habits yet  •  build a small daily rhythm";
+            case "expenseTable" -> "✦  No expenses recorded yet";
+            case "incomeTable" -> "✦  No income recorded yet";
+            default -> "✦  Nothing here yet";
+        };
+        Label label = new Label(text);
         label.setTextFill(MUTED);
-        label.setFont(Font.font(FONT_BOLD, 14));
+        label.setFont(Font.font(FONT_BOLD, 13));
+        label.setWrapText(true);
+        label.setAlignment(javafx.geometry.Pos.CENTER);
         return label;
     }
 

@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane fx:id="root" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -47,53 +48,56 @@
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true">
             <content>
-                <VBox spacing="18" fillWidth="true">
-                    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
-                    <HBox spacing="12" alignment="CENTER_LEFT">
-                        <Label fx:id="greetingLabel" text="Good afternoon">
-                            <font><Font name="System Bold" size="27"/></font>
-                        </Label>
-                        <Button text="Refresh" onAction="#onRefresh"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Button text="Notifications" onAction="#onOpenNotifications"/>
-                        <Label fx:id="notificationCountLabel" text="0"/>
-                    </HBox>
+                <VBox spacing="18" fillWidth="true" id="dashboardContent">
+                    <padding><Insets top="26" right="30" bottom="30" left="30"/></padding>
+                    <VBox id="dashboardHero" spacing="6" maxWidth="Infinity">
+                        <Label id="dashboardKicker" text="MOMENTA • COMMAND CENTER"/>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <VBox spacing="3">
+                                <Label fx:id="greetingLabel" text="Good afternoon">
+                                    <font><Font name="System Bold" size="29"/></font>
+                                </Label>
+                                <Label id="dashboardSubtitle" text="A clear view of what matters now, what is moving, and what needs attention." wrapText="true"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <VBox spacing="7" alignment="CENTER_RIGHT">
+                                <HBox spacing="8" alignment="CENTER_RIGHT">
+                                    <Button text="Refresh" onAction="#onRefresh"/>
+                                    <Button text="Notifications" onAction="#onOpenNotifications"/>
+                                    <Label fx:id="notificationCountLabel" text="0"/>
+                                </HBox>
+                                <Label id="dashboardStatus" text="LIVE • PERSONALIZED"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
                     <Separator/>
 
-                    <GridPane hgap="14" vgap="14" maxWidth="Infinity">
-                        <columnConstraints>
-                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
-                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
-                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
-                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
-                        </columnConstraints>
-                        <rowConstraints><RowConstraints vgrow="NEVER"/></rowConstraints>
-
-                        <VBox fx:id="pulseCard" GridPane.columnIndex="0" maxWidth="Infinity">
+                    <FlowPane id="metricStrip" hgap="14" vgap="14" prefWrapLength="980" maxWidth="Infinity">
+                        <VBox fx:id="pulseCard" minWidth="190" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                             <children>
                                 <Label text="MOMENTA PULSE"/>
                                 <Label fx:id="pulseLabel" text="—"><font><Font name="System Bold" size="28"/></font></Label>
                             </children>
                         </VBox>
-                        <VBox fx:id="taskCard" GridPane.columnIndex="1" maxWidth="Infinity">
+                        <VBox fx:id="taskCard" minWidth="190" maxWidth="Infinity">
                             <children>
                                 <Label text="INCOMPLETE TASKS"/>
                                 <Label fx:id="taskCountLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
                             </children>
                         </VBox>
-                        <VBox fx:id="goalCard" GridPane.columnIndex="2" maxWidth="Infinity">
+                        <VBox fx:id="goalCard" minWidth="190" maxWidth="Infinity">
                             <children>
                                 <Label text="ACTIVE GOALS"/>
                                 <Label fx:id="goalCountLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
                             </children>
                         </VBox>
-                        <VBox fx:id="projectCard" GridPane.columnIndex="3" maxWidth="Infinity">
+                        <VBox fx:id="projectCard" minWidth="190" maxWidth="Infinity">
                             <children>
                                 <Label text="ACTIVE PROJECTS"/>
                                 <Label fx:id="projectCountLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
                             </children>
                         </VBox>
-                    </GridPane>
+                    </FlowPane>
 
                     <VBox fx:id="gamificationCard" spacing="8" maxWidth="Infinity">
                         <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
@@ -115,7 +119,8 @@
                     </VBox>
 
                     <VBox fx:id="nowCard" spacing="10" maxWidth="Infinity">
-                        <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                        <Label id="nowKicker" text="MOMENTA NOW • NEXT ACTION"/>
                         <Label text="MOMENTA NOW">
                             <font><Font name="System Bold" size="19"/></font>
                         </Label>
@@ -133,7 +138,7 @@
                         <Button text="Open Tasks" onAction="#onOpenTasks" maxWidth="160"/>
                     </VBox>
 
-                    <VBox spacing="10" maxWidth="Infinity">
+                    <VBox id="notificationsCard" spacing="10" maxWidth="Infinity">
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <Label text="Recent Notifications"><font><Font name="System Bold" size="17"/></font></Label>
                             <Region HBox.hgrow="ALWAYS"/>

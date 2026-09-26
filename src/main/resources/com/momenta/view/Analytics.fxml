@@ -14,7 +14,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.Region?>
@@ -43,28 +42,23 @@
                 <VBox id="analyticsContent" spacing="18" fillWidth="true">
                     <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
 
-                    <GridPane hgap="14" vgap="14" maxWidth="Infinity">
-                        <columnConstraints>
-                            <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
-                            <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
-                            <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
-                        </columnConstraints>
-                        <VBox id="analyticsPulseCard" GridPane.columnIndex="0" spacing="8" maxWidth="Infinity" minWidth="180">
+                    <FlowPane hgap="14" vgap="14" prefWrapLength="900" maxWidth="Infinity">
+                        <VBox id="analyticsPulseCard" spacing="8" maxWidth="Infinity" minWidth="210" prefWidth="280">
                             <Label text="MOMENTA PULSE"/>
                             <Label fx:id="pulseLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
                             <ProgressBar fx:id="pulseProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
-                        <VBox id="analyticsProductivityCard" GridPane.columnIndex="1" spacing="8" maxWidth="Infinity" minWidth="180">
+                        <VBox id="analyticsProductivityCard" spacing="8" maxWidth="Infinity" minWidth="210" prefWidth="280">
                             <Label text="PRODUCTIVITY"/>
                             <Label fx:id="productivityLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
                             <ProgressBar fx:id="productivityProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
-                        <VBox id="analyticsHabitCard" GridPane.columnIndex="2" spacing="8" maxWidth="Infinity" minWidth="180">
+                        <VBox id="analyticsHabitCard" spacing="8" maxWidth="Infinity" minWidth="210" prefWidth="280">
                             <Label text="HABIT CONSISTENCY"/>
                             <Label fx:id="habitConsistencyLabel" text="0%"><font><Font name="System Bold" size="28"/></font></Label>
                             <ProgressBar fx:id="habitProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
-                    </GridPane>
+                    </FlowPane>
 
                     <Separator/>
 
@@ -86,19 +80,19 @@
                     <Label fx:id="financeLabel" text="Income: 0.00    Expenses: 0.00    Balance: 0.00" wrapText="true"/>
 
                     <Label text="Weekly Focus Minutes"><font><Font name="System Bold" size="17"/></font></Label>
-                    <BarChart fx:id="focusChart" animated="false" legendVisible="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
+                    <BarChart id="focusChartSurface" fx:id="focusChart" animated="false" legendVisible="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
                         <xAxis><CategoryAxis label="Date"/></xAxis>
                         <yAxis><NumberAxis label="Minutes"/></yAxis>
                     </BarChart>
 
                     <Label text="Weekly Spending Trend"><font><Font name="System Bold" size="17"/></font></Label>
-                    <LineChart fx:id="spendingChart" animated="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
+                    <LineChart id="spendingChartSurface" fx:id="spendingChart" animated="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
                         <xAxis><CategoryAxis label="Date"/></xAxis>
                         <yAxis><NumberAxis label="Amount"/></yAxis>
                     </LineChart>
 
                     <Label text="Spending by Category"><font><Font name="System Bold" size="17"/></font></Label>
-                    <PieChart fx:id="spendingCategoryChart" minHeight="300" prefHeight="340" maxWidth="Infinity"/>
+                    <PieChart id="spendingCategoryChartSurface" fx:id="spendingCategoryChart" minHeight="300" prefHeight="340" maxWidth="Infinity"/>
                 </VBox>
             </content>
         </ScrollPane>
