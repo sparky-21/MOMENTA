@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -8,40 +9,49 @@
             fx:controller="com.momenta.controller.FocusController">
     <top>
         <HBox spacing="12" alignment="CENTER_LEFT">
-            <padding><Insets top="20" right="24" bottom="12" left="24"/></padding>
+            <padding><Insets top="18" right="24" bottom="12" left="24"/></padding>
             <Button text="← Dashboard" onAction="#onBackToDashboard"/>
             <Label text="Focus Mode"><font><Font name="System Bold" size="26"/></font></Label>
         </HBox>
     </top>
+
     <center>
-        <VBox spacing="18" alignment="TOP_CENTER">
-            <padding><Insets top="20" right="40" bottom="20" left="40"/></padding>
-            <Label text="FOCUS"/>
-            <Label fx:id="timerLabel" text="25:00">
-                <font><Font name="System Bold" size="64"/></font>
-            </Label>
-            <HBox spacing="10" alignment="CENTER">
-                <Label text="Task:"/>
-                <ComboBox fx:id="taskCombo" prefWidth="300" promptText="Choose a task"/>
-                <Label text="Minutes:"/>
-                <Spinner fx:id="durationSpinner" prefWidth="90"/>
-            </HBox>
-            <HBox spacing="10" alignment="CENTER">
-                <Button text="Start" onAction="#onStart"/>
-                <Button text="Pause" onAction="#onPause"/>
-                <Button text="Resume" onAction="#onResume"/>
-                <Button text="Stop / Complete" onAction="#onStop"/>
-            </HBox>
-            <Label fx:id="statusLabel" text="Ready"/>
-            <Separator/>
-            <Label text="Session History"><font><Font name="System Bold" size="18"/></font></Label>
-            <TableView fx:id="historyTable" prefHeight="280">
-                <columns>
-                    <TableColumn fx:id="historyTaskColumn" text="Task" prefWidth="280"/>
-                    <TableColumn fx:id="historyDurationColumn" text="Minutes" prefWidth="100"/>
-                    <TableColumn fx:id="historyStartedColumn" text="Started At" prefWidth="260"/>
-                </columns>
-            </TableView>
-        </VBox>
+        <ScrollPane fitToWidth="true" pannable="true">
+            <content>
+                <VBox spacing="18" alignment="TOP_CENTER" fillWidth="true">
+                    <padding><Insets top="20" right="40" bottom="30" left="40"/></padding>
+                    <VBox spacing="8" alignment="CENTER" maxWidth="720">
+                        <Label text="FOCUS">
+                            <font><Font name="System Bold" size="15"/></font>
+                        </Label>
+                        <Label fx:id="timerLabel" text="25:00">
+                            <font><Font name="System Bold" size="64"/></font>
+                        </Label>
+                    </VBox>
+                    <FlowPane hgap="10" vgap="10" alignment="CENTER" prefWrapLength="720" maxWidth="Infinity">
+                        <Label text="Task:"/>
+                        <ComboBox fx:id="taskCombo" prefWidth="300" promptText="Choose a task"/>
+                        <Label text="Minutes:"/>
+                        <Spinner fx:id="durationSpinner" prefWidth="90"/>
+                    </FlowPane>
+                    <FlowPane hgap="10" vgap="10" alignment="CENTER" prefWrapLength="720" maxWidth="Infinity">
+                        <Button text="Start" onAction="#onStart"/>
+                        <Button text="Pause" onAction="#onPause"/>
+                        <Button text="Resume" onAction="#onResume"/>
+                        <Button text="Stop / Complete" onAction="#onStop"/>
+                    </FlowPane>
+                    <Label fx:id="statusLabel" text="Ready" wrapText="true"/>
+                    <Separator/>
+                    <Label text="Session History"><font><Font name="System Bold" size="18"/></font></Label>
+                    <TableView fx:id="historyTable" prefHeight="280" minHeight="220" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="historyTaskColumn" text="Task" prefWidth="280"/>
+                            <TableColumn fx:id="historyDurationColumn" text="Minutes" prefWidth="100"/>
+                            <TableColumn fx:id="historyStartedColumn" text="Started At" prefWidth="260"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>

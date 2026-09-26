@@ -12,8 +12,11 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -35,74 +38,67 @@
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" fitToHeight="true">
+        <ScrollPane fitToWidth="true" pannable="true">
             <content>
-                <VBox spacing="18">
+                <VBox spacing="18" fillWidth="true">
                     <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
 
-                    <GridPane hgap="14" vgap="14">
-                        <VBox GridPane.columnIndex="0" spacing="8">
-                            <children>
-                                <Label text="MOMENTA PULSE"/>
-                                <Label fx:id="pulseLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
-                                <ProgressBar fx:id="pulseProgress" progress="0" maxWidth="Infinity"/>
-                            </children>
+                    <GridPane hgap="14" vgap="14" maxWidth="Infinity">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <VBox GridPane.columnIndex="0" spacing="8" maxWidth="Infinity" minWidth="180">
+                            <Label text="MOMENTA PULSE"/>
+                            <Label fx:id="pulseLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
+                            <ProgressBar fx:id="pulseProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
-                        <VBox GridPane.columnIndex="1" spacing="8">
-                            <children>
-                                <Label text="PRODUCTIVITY"/>
-                                <Label fx:id="productivityLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
-                                <ProgressBar fx:id="productivityProgress" progress="0" maxWidth="Infinity"/>
-                            </children>
+                        <VBox GridPane.columnIndex="1" spacing="8" maxWidth="Infinity" minWidth="180">
+                            <Label text="PRODUCTIVITY"/>
+                            <Label fx:id="productivityLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
+                            <ProgressBar fx:id="productivityProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
-                        <VBox GridPane.columnIndex="2" spacing="8">
-                            <children>
-                                <Label text="HABIT CONSISTENCY"/>
-                                <Label fx:id="habitConsistencyLabel" text="0%"><font><Font name="System Bold" size="28"/></font></Label>
-                                <ProgressBar fx:id="habitProgress" progress="0" maxWidth="Infinity"/>
-                            </children>
+                        <VBox GridPane.columnIndex="2" spacing="8" maxWidth="Infinity" minWidth="180">
+                            <Label text="HABIT CONSISTENCY"/>
+                            <Label fx:id="habitConsistencyLabel" text="0%"><font><Font name="System Bold" size="28"/></font></Label>
+                            <ProgressBar fx:id="habitProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
                     </GridPane>
 
                     <Separator/>
 
-                    <HBox spacing="30">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <FlowPane hgap="24" vgap="14" prefWrapLength="760" maxWidth="Infinity">
+                        <VBox spacing="6" minWidth="190">
                             <Label text="Task Completion"><font><Font name="System Bold" size="15"/></font></Label>
                             <Label fx:id="taskCompletionLabel" text="0 / 0 (0%)"/>
                         </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <VBox spacing="6" minWidth="190">
                             <Label text="Goal Completion"><font><Font name="System Bold" size="15"/></font></Label>
                             <Label fx:id="goalCompletionLabel" text="0 / 0 (0%)"/>
                         </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <VBox spacing="6" minWidth="190">
                             <Label text="Focus Score"><font><Font name="System Bold" size="15"/></font></Label>
                             <Label fx:id="focusScoreLabel" text="0 / 100"/>
                         </VBox>
-                    </HBox>
+                    </FlowPane>
 
-                    <Label fx:id="financeLabel" text="Income: 0.00    Expenses: 0.00    Balance: 0.00"/>
+                    <Label fx:id="financeLabel" text="Income: 0.00    Expenses: 0.00    Balance: 0.00" wrapText="true"/>
 
-                    <Label text="Weekly Focus Minutes">
-                        <font><Font name="System Bold" size="17"/></font>
-                    </Label>
-                    <BarChart fx:id="focusChart" animated="false" legendVisible="false" prefHeight="300">
+                    <Label text="Weekly Focus Minutes"><font><Font name="System Bold" size="17"/></font></Label>
+                    <BarChart fx:id="focusChart" animated="false" legendVisible="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
                         <xAxis><CategoryAxis label="Date"/></xAxis>
                         <yAxis><NumberAxis label="Minutes"/></yAxis>
                     </BarChart>
 
-                    <Label text="Weekly Spending Trend">
-                        <font><Font name="System Bold" size="17"/></font>
-                    </Label>
-                    <LineChart fx:id="spendingChart" animated="false" prefHeight="300">
+                    <Label text="Weekly Spending Trend"><font><Font name="System Bold" size="17"/></font></Label>
+                    <LineChart fx:id="spendingChart" animated="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
                         <xAxis><CategoryAxis label="Date"/></xAxis>
                         <yAxis><NumberAxis label="Amount"/></yAxis>
                     </LineChart>
 
-                    <Label text="Spending by Category">
-                        <font><Font name="System Bold" size="17"/></font>
-                    </Label>
-                    <PieChart fx:id="spendingCategoryChart" prefHeight="320"/>
+                    <Label text="Spending by Category"><font><Font name="System Bold" size="17"/></font></Label>
+                    <PieChart fx:id="spendingCategoryChart" minHeight="300" prefHeight="340" maxWidth="Infinity"/>
                 </VBox>
             </content>
         </ScrollPane>

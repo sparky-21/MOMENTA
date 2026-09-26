@@ -17,7 +17,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -387,9 +389,10 @@ public class CalendarController {
                     new Insets(8));
 
 
-            label.setStyle(
-                    "-fx-font-weight: bold;" +
-                            "-fx-font-size: 13px;");
+            label.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 13));
+            label.setTextFill(com.momenta.utility.MomentaTheme.SEA_GREEN);
+            label.setBackground(new Background(new BackgroundFill(
+                    com.momenta.utility.MomentaTheme.MINT, new CornerRadii(8), Insets.EMPTY)));
 
 
             calendarGrid.add(
@@ -439,41 +442,19 @@ public class CalendarController {
                 date.equals(selectedDate);
 
 
-        String background =
-                currentMonth
-                        ? "#ffffff"
-                        : "#f4f4f4";
+        Color background = currentMonth
+                ? Color.WHITE
+                : Color.web("#EEF4F6");
+        Color border = selected
+                ? com.momenta.utility.MomentaTheme.SEA_GREEN
+                : Color.web("#D8E2E5");
+        double borderWidth = selected ? 2 : 1;
 
-
-        String border =
-                selected
-                        ? "#4a6cf7"
-                        : "#dddddd";
-
-
-        String borderWidth =
-                selected
-                        ? "2"
-                        : "1";
-
-
-        cell.setStyle(
-                "-fx-background-color: "
-                        + background
-                        + ";"
-                        +
-                        "-fx-border-color: "
-                        + border
-                        + ";"
-                        +
-                        "-fx-border-width: "
-                        + borderWidth
-                        + ";"
-                        +
-                        "-fx-background-radius: 3;"
-                        +
-                        "-fx-border-radius: 3;"
-        );
+        cell.setBackground(new Background(new BackgroundFill(
+                background, new CornerRadii(6), Insets.EMPTY)));
+        cell.setBorder(new Border(new BorderStroke(
+                border, BorderStrokeStyle.SOLID, new CornerRadii(6),
+                new BorderWidths(borderWidth))));
 
 
         // -----------------------------------------------------
@@ -486,21 +467,12 @@ public class CalendarController {
                                 date.getDayOfMonth()));
 
 
-        dayNumber.setStyle(
-                "-fx-font-weight: bold;"
-                        +
-                        "-fx-font-size: 13px;"
-                        +
-                        (
-                                today
-                                        ?
-                                        " -fx-background-color: #4a6cf7;"
-                                                +
-                                                " -fx-text-fill: white;"
-                                        :
-                                        ""
-                        )
-        );
+        dayNumber.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 13));
+        dayNumber.setTextFill(today ? Color.WHITE : com.momenta.utility.MomentaTheme.CHARCOAL);
+        if (today) {
+            dayNumber.setBackground(new Background(new BackgroundFill(
+                    com.momenta.utility.MomentaTheme.SEA_GREEN, new CornerRadii(10), Insets.EMPTY)));
+        }
 
 
         if (today) {
@@ -587,13 +559,13 @@ public class CalendarController {
                             5));
 
 
-            eventButton.setStyle(
-                    "-fx-background-color: #e8edff;"
-                            +
-                            "-fx-text-fill: #263b80;"
-                            +
-                            "-fx-font-size: 11px;"
-            );
+            eventButton.setFont(Font.font("System", 11));
+            eventButton.setTextFill(com.momenta.utility.MomentaTheme.SEA_GREEN);
+            eventButton.setBackground(new Background(new BackgroundFill(
+                    com.momenta.utility.MomentaTheme.MINT, new CornerRadii(6), Insets.EMPTY)));
+            eventButton.setBorder(new Border(new BorderStroke(
+                    com.momenta.utility.MomentaTheme.SEA_GREEN, BorderStrokeStyle.SOLID,
+                    new CornerRadii(6), new BorderWidths(1))));
 
 
             eventButton.setOnAction(e -> {
@@ -639,11 +611,8 @@ public class CalendarController {
             taskLabel.setWrapText(false);
 
 
-            taskLabel.setStyle(
-                    "-fx-text-fill: #555555;"
-                            +
-                            "-fx-font-size: 11px;"
-            );
+            taskLabel.setFont(Font.font("System", 11));
+            taskLabel.setTextFill(com.momenta.utility.MomentaTheme.CHARCOAL);
 
 
             cell.getChildren().add(
@@ -675,13 +644,8 @@ public class CalendarController {
                                     " more");
 
 
-            more.setStyle(
-                    "-fx-text-fill: #777777;"
-                            +
-                            "-fx-font-size: 10px;"
-                            +
-                            "-fx-font-weight: bold;"
-            );
+            more.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 10));
+            more.setTextFill(com.momenta.utility.MomentaTheme.MUTED);
 
 
             cell.getChildren().add(

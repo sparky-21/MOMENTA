@@ -8,7 +8,9 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -17,46 +19,43 @@
             fx:controller="com.momenta.controller.HabitController">
 
     <top>
-        <VBox spacing="10">
-            <padding><Insets top="20" right="24" bottom="10" left="24"/></padding>
-
+        <VBox spacing="10" fillWidth="true">
+            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
                 <Label text="Habits">
                     <font><Font name="System Bold" size="24"/></font>
                 </Label>
             </HBox>
-
-            <HBox spacing="10" alignment="CENTER_LEFT">
+            <FlowPane hgap="8" vgap="8" prefWrapLength="760" maxWidth="Infinity" alignment="CENTER_LEFT">
                 <Button text="Add Habit" onAction="#onAddHabit"/>
                 <Button text="Edit" onAction="#onEditHabit"/>
                 <Button text="Delete" onAction="#onDeleteHabit"/>
                 <Button text="Toggle Today" onAction="#onToggleToday"/>
                 <Label text="Date:"/>
                 <DatePicker fx:id="datePicker" onAction="#onDateChanged"/>
-            </HBox>
+            </FlowPane>
         </VBox>
     </top>
 
     <center>
-        <HBox spacing="16">
+        <HBox spacing="16" fillHeight="true">
             <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
-
-            <TableView fx:id="habitTable" onMouseClicked="#onSelectHabit" HBox.hgrow="ALWAYS" prefWidth="500">
+            <TableView fx:id="habitTable" onMouseClicked="#onSelectHabit" HBox.hgrow="ALWAYS"
+                       minWidth="320" maxWidth="Infinity" maxHeight="Infinity">
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Habit" prefWidth="220"/>
                     <TableColumn fx:id="currentStreakColumn" text="Current Streak" prefWidth="120"/>
                     <TableColumn fx:id="longestStreakColumn" text="Longest Streak" prefWidth="120"/>
                 </columns>
             </TableView>
-
-            <VBox spacing="12" prefWidth="260">
+            <VBox spacing="12" prefWidth="260" minWidth="220" maxWidth="320">
                 <Label text="Selected Habit">
                     <font><Font name="System Bold" size="16"/></font>
                 </Label>
-                <Label fx:id="selectedStatusLabel" text="Select a habit." wrapText="true"/>
-                <Label fx:id="weeklyLabel" text="Weekly consistency: —"/>
-                <ProgressBar fx:id="weeklyProgressBar" progress="0" prefWidth="240"/>
+                <Label fx:id="selectedStatusLabel" text="Select a habit." wrapText="true" maxWidth="Infinity"/>
+                <Label fx:id="weeklyLabel" text="Weekly consistency: —" wrapText="true"/>
+                <ProgressBar fx:id="weeklyProgressBar" progress="0" maxWidth="Infinity"/>
             </VBox>
         </HBox>
     </center>

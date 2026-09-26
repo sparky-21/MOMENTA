@@ -54,6 +54,14 @@ public final class SceneManager {
                 scene.setRoot(root);
             }
 
+            // Phase 18: keep every view bounded by the live window size.
+            // maxWidth/maxHeight bindings avoid the old dashboard min-width
+            // feedback problem while still demonstrating JavaFX property binding.
+            bindRootToScene(root);
+
+            // Phase 19: apply the complete MOMENTA palette without CSS.
+            MomentaTheme.apply(root, viewName);
+
             FadeTransition fade = new FadeTransition(Duration.millis(220), root);
             fade.setFromValue(0);
             fade.setToValue(1);
@@ -67,6 +75,17 @@ public final class SceneManager {
     /** Drops a cached view so the next switchTo(viewName) reloads it fresh from data. */
     public void invalidate(String viewName) {
         viewCache.remove(viewName);
+    }
+
+    private void bindRootToScene(Parent root) {
+        if (!(root instanceof javafx.scene.layout.Region region) || scene == null) {
+            return;
+        }
+
+        region.maxWidthProperty().unbind();
+        region.maxHeightProperty().unbind();
+        region.maxWidthProperty().bind(scene.widthProperty());
+        region.maxHeightProperty().bind(scene.heightProperty());
     }
 
     private Parent load(String viewName) {

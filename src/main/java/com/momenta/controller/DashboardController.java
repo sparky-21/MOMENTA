@@ -13,15 +13,12 @@ import com.momenta.utility.AlertUtil;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
 import javafx.animation.FadeTransition;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.time.LocalTime;
@@ -49,6 +46,7 @@ public class DashboardController {
     @FXML private VBox taskCard;
     @FXML private VBox goalCard;
     @FXML private VBox projectCard;
+    @FXML private VBox nowCard;
     @FXML private Label insightLabel;
     @FXML private Label insightAuthorLabel;
 
@@ -61,51 +59,11 @@ public class DashboardController {
     @FXML
     public void initialize() {
         greetingLabel.setText(greetingForNow());
-        applyVisualTheme();
+        notificationList.setPrefHeight(120);
+        notificationList.setPlaceholder(new Label("No notifications yet."));
         loadDashboardData();
         loadNotifications();
         loadDailyInsight();
-
-        // Explicit JavaFX property binding demonstrates responsive sizing without CSS.
-        Platform.runLater(() -> {
-            if (root.getScene() != null) {
-                root.minWidthProperty().bind(root.getScene().widthProperty().multiply(0.65));
-            }
-        });
-    }
-
-    private void applyVisualTheme() {
-        Color seaGreen = Color.web("#287F78");
-        Color mint = Color.web("#B8F2E6");
-        Color sky = Color.web("#F4FAFC");
-        Color skyBlue = Color.web("#5DADE2");
-        Color lavender = Color.web("#9B8AFB");
-        Color softGreen = Color.web("#6BCB9A");
-        Color charcoal = Color.web("#263238");
-
-        root.setBackground(new Background(new BackgroundFill(sky, CornerRadii.EMPTY, Insets.EMPTY)));
-        sidebar.setBackground(new Background(new BackgroundFill(seaGreen, CornerRadii.EMPTY, Insets.EMPTY)));
-        sidebar.setPadding(new Insets(20, 14, 20, 14));
-
-        styleCard(pulseCard, lavender, charcoal);
-        styleCard(taskCard, skyBlue, charcoal);
-        styleCard(goalCard, softGreen, charcoal);
-        styleCard(projectCard, mint, charcoal);
-
-        notificationList.setPrefHeight(120);
-        notificationList.setPlaceholder(new Label("No notifications yet."));
-    }
-
-    private void styleCard(VBox card, Color accent, Color textColor) {
-        if (card == null) return;
-        card.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(14), Insets.EMPTY)));
-        card.setBorder(new Border(new BorderStroke(
-                accent, BorderStrokeStyle.SOLID, new CornerRadii(14), new BorderWidths(2))));
-        card.setPadding(new Insets(14));
-        card.setSpacing(8);
-        for (Node node : card.getChildren()) {
-            if (node instanceof Label label) label.setTextFill(textColor);
-        }
     }
 
     private void loadDashboardData() {

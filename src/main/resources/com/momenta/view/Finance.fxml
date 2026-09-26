@@ -6,8 +6,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -16,83 +21,85 @@
             fx:controller="com.momenta.controller.FinanceController">
 
     <top>
-        <VBox spacing="10">
-            <padding><Insets top="20" right="24" bottom="10" left="24"/></padding>
-
+        <VBox spacing="10" fillWidth="true">
+            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
                 <Label text="Finance">
                     <font><Font name="System Bold" size="24"/></font>
                 </Label>
             </HBox>
-
-            <HBox spacing="30" alignment="CENTER_LEFT">
-                <VBox>
+            <FlowPane hgap="18" vgap="8" prefWrapLength="760" maxWidth="Infinity" alignment="CENTER_LEFT">
+                <VBox minWidth="140">
                     <Label text="Income"/>
                     <Label fx:id="incomeLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
-                <VBox>
+                <VBox minWidth="140">
                     <Label text="Expenses"/>
                     <Label fx:id="expenseLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
-                <VBox>
+                <VBox minWidth="140">
                     <Label text="Balance"/>
                     <Label fx:id="balanceLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
-                <VBox>
+                <VBox minWidth="140">
                     <Label text="Savings Rate"/>
                     <Label fx:id="savingsLabel" text="0.0%"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
-            </HBox>
-
-            <HBox spacing="10">
+            </FlowPane>
+            <FlowPane hgap="8" vgap="8" prefWrapLength="760" maxWidth="Infinity">
                 <Button text="Add Expense" onAction="#onAddExpense"/>
                 <Button text="Edit Expense" onAction="#onEditExpense"/>
                 <Button text="Delete Expense" onAction="#onDeleteExpense"/>
                 <Button text="Add Income" onAction="#onAddIncome"/>
                 <Button text="Edit Income" onAction="#onEditIncome"/>
                 <Button text="Delete Income" onAction="#onDeleteIncome"/>
-            </HBox>
+            </FlowPane>
         </VBox>
     </top>
 
     <center>
-        <HBox spacing="16">
-            <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
+        <ScrollPane fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
+            <content>
+                <GridPane hgap="16" vgap="16" maxWidth="Infinity">
+                    <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="40" hgrow="ALWAYS" minWidth="320"/>
+                        <ColumnConstraints percentWidth="30" hgrow="ALWAYS" minWidth="260"/>
+                        <ColumnConstraints percentWidth="30" hgrow="ALWAYS" minWidth="240"/>
+                    </columnConstraints>
+                    <rowConstraints><RowConstraints vgrow="ALWAYS"/></rowConstraints>
 
-            <VBox spacing="8" HBox.hgrow="ALWAYS" prefWidth="360">
-                <Label text="Expenses">
-                    <font><Font name="System Bold" size="14"/></font>
-                </Label>
-                <TableView fx:id="expenseTable" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="expenseDateColumn" text="Date" prefWidth="90"/>
-                        <TableColumn fx:id="expenseCategoryColumn" text="Category" prefWidth="100"/>
-                        <TableColumn fx:id="expenseNoteColumn" text="Note" prefWidth="100"/>
-                        <TableColumn fx:id="expenseAmountColumn" text="Amount" prefWidth="80"/>
-                    </columns>
-                </TableView>
-            </VBox>
+                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0" minHeight="420">
+                        <Label text="Expenses"><font><Font name="System Bold" size="14"/></font></Label>
+                        <TableView fx:id="expenseTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+                            <columns>
+                                <TableColumn fx:id="expenseDateColumn" text="Date" prefWidth="90"/>
+                                <TableColumn fx:id="expenseCategoryColumn" text="Category" prefWidth="100"/>
+                                <TableColumn fx:id="expenseNoteColumn" text="Note" prefWidth="100"/>
+                                <TableColumn fx:id="expenseAmountColumn" text="Amount" prefWidth="80"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
 
-            <VBox spacing="8" HBox.hgrow="ALWAYS" prefWidth="300">
-                <Label text="Income">
-                    <font><Font name="System Bold" size="14"/></font>
-                </Label>
-                <TableView fx:id="incomeTable" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="incomeDateColumn" text="Date" prefWidth="100"/>
-                        <TableColumn fx:id="incomeSourceColumn" text="Source" prefWidth="100"/>
-                        <TableColumn fx:id="incomeAmountColumn" text="Amount" prefWidth="90"/>
-                    </columns>
-                </TableView>
-            </VBox>
+                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0" minHeight="420">
+                        <Label text="Income"><font><Font name="System Bold" size="14"/></font></Label>
+                        <TableView fx:id="incomeTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+                            <columns>
+                                <TableColumn fx:id="incomeDateColumn" text="Date" prefWidth="100"/>
+                                <TableColumn fx:id="incomeSourceColumn" text="Source" prefWidth="100"/>
+                                <TableColumn fx:id="incomeAmountColumn" text="Amount" prefWidth="90"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
 
-            <VBox spacing="8" prefWidth="280">
-                <Label text="Spending by Category">
-                    <font><Font name="System Bold" size="14"/></font>
-                </Label>
-                <PieChart fx:id="categoryChart" legendVisible="true" labelsVisible="true" VBox.vgrow="ALWAYS"/>
-            </VBox>
-        </HBox>
+                    <VBox spacing="8" GridPane.columnIndex="2" GridPane.rowIndex="0" minHeight="420">
+                        <Label text="Spending by Category"><font><Font name="System Bold" size="14"/></font></Label>
+                        <PieChart fx:id="categoryChart" legendVisible="true" labelsVisible="true" VBox.vgrow="ALWAYS"
+                                  minWidth="240" minHeight="360" maxWidth="Infinity"/>
+                    </VBox>
+                </GridPane>
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>

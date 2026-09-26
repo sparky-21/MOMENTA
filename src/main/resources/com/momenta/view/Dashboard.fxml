@@ -95,7 +95,7 @@
                         </VBox>
                     </GridPane>
 
-                    <VBox spacing="10" maxWidth="Infinity">
+                    <VBox fx:id="nowCard" spacing="10" maxWidth="Infinity">
                         <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
                         <Label text="MOMENTA NOW">
                             <font><Font name="System Bold" size="19"/></font>

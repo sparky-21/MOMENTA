@@ -19,8 +19,8 @@ public class Main extends Application {
         SceneManager.getInstance().switchTo("Login");
 
         primaryStage.setTitle("MOMENTA — Personal Operating System");
-        primaryStage.setMinWidth(1100);
-        primaryStage.setMinHeight(700);
+        primaryStage.setMinWidth(900);
+        primaryStage.setMinHeight(620);
         primaryStage.show();
 
         notificationScheduler.start();
