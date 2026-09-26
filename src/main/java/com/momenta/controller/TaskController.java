@@ -259,6 +259,9 @@ public class TaskController {
                 return null;
             }
             Task task = isEdit ? existing : new Task();
+            if (!isEdit) {
+                task.setUserId(CurrentUser.getId());
+            }
             task.setTitle(titleField.getText().trim());
             task.setDescription(descriptionArea.getText());
             task.setCategory(categoryBox.getValue());

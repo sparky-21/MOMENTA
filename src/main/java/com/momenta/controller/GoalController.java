@@ -194,6 +194,9 @@ public class GoalController {
                 return null;
             }
             Goal goal = isEdit ? existing : new Goal();
+            if (!isEdit) {
+                goal.setUserId(CurrentUser.getId());
+            }
             goal.setTitle(titleField.getText().trim());
             goal.setDescription(descriptionArea.getText());
             goal.setParentGoalId(parentBox.getValue() == null ? null : parentBox.getValue().getId());

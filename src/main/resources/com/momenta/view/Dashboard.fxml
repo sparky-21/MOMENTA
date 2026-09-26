@@ -36,7 +36,7 @@
                 <Button text="Habits" maxWidth="Infinity" onAction="#onOpenHabits"/>
                 <Button text="Finance" maxWidth="Infinity" onAction="#onOpenFinance"/>
                 <Button text="Focus" maxWidth="Infinity" onAction="#onOpenFocus"/>
-                <Button text="Analytics" maxWidth="Infinity" disable="true"/>
+                <Button text="Analytics" maxWidth="Infinity" onAction="#onOpenAnalytics"/>
                 <Separator/>
                 <Button text="Settings" maxWidth="Infinity" disable="true"/>
             </children>

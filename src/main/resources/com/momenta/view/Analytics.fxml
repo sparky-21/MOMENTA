@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.momenta.controller.AnalyticsController">
+
+    <top>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+            <Label text="MOMENTA ANALYTICS">
+                <font><Font name="System Bold" size="24"/></font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Refresh" onAction="#onRefresh"/>
+            <Button text="Back to Dashboard" onAction="#onBackToDashboard"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <content>
+                <VBox spacing="18">
+                    <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+
+                    <GridPane hgap="14" vgap="14">
+                        <VBox GridPane.columnIndex="0" spacing="8">
+                            <children>
+                                <Label text="MOMENTA PULSE"/>
+                                <Label fx:id="pulseLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
+                                <ProgressBar fx:id="pulseProgress" progress="0" maxWidth="Infinity"/>
+                            </children>
+                        </VBox>
+                        <VBox GridPane.columnIndex="1" spacing="8">
+                            <children>
+                                <Label text="PRODUCTIVITY"/>
+                                <Label fx:id="productivityLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
+                                <ProgressBar fx:id="productivityProgress" progress="0" maxWidth="Infinity"/>
+                            </children>
+                        </VBox>
+                        <VBox GridPane.columnIndex="2" spacing="8">
+                            <children>
+                                <Label text="HABIT CONSISTENCY"/>
+                                <Label fx:id="habitConsistencyLabel" text="0%"><font><Font name="System Bold" size="28"/></font></Label>
+                                <ProgressBar fx:id="habitProgress" progress="0" maxWidth="Infinity"/>
+                            </children>
+                        </VBox>
+                    </GridPane>
+
+                    <Separator/>
+
+                    <HBox spacing="30">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Task Completion"><font><Font name="System Bold" size="15"/></font></Label>
+                            <Label fx:id="taskCompletionLabel" text="0 / 0 (0%)"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Goal Completion"><font><Font name="System Bold" size="15"/></font></Label>
+                            <Label fx:id="goalCompletionLabel" text="0 / 0 (0%)"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Focus Score"><font><Font name="System Bold" size="15"/></font></Label>
+                            <Label fx:id="focusScoreLabel" text="0 / 100"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label fx:id="financeLabel" text="Income: 0.00    Expenses: 0.00    Balance: 0.00"/>
+
+                    <Label text="Weekly Focus Minutes">
+                        <font><Font name="System Bold" size="17"/></font>
+                    </Label>
+                    <BarChart fx:id="focusChart" animated="false" legendVisible="false" prefHeight="300">
+                        <xAxis><CategoryAxis label="Date"/></xAxis>
+                        <yAxis><NumberAxis label="Minutes"/></yAxis>
+                    </BarChart>
+
+                    <Label text="Weekly Spending Trend">
+                        <font><Font name="System Bold" size="17"/></font>
+                    </Label>
+                    <LineChart fx:id="spendingChart" animated="false" prefHeight="300">
+                        <xAxis><CategoryAxis label="Date"/></xAxis>
+                        <yAxis><NumberAxis label="Amount"/></yAxis>
+                    </LineChart>
+
+                    <Label text="Spending by Category">
+                        <font><Font name="System Bold" size="17"/></font>
+                    </Label>
+                    <PieChart fx:id="spendingCategoryChart" prefHeight="320"/>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

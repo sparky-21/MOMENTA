@@ -205,7 +205,7 @@ public class DashboardController {
     @FXML private void onOpenHabits() { SceneManager.getInstance().invalidate("Habits"); SceneManager.getInstance().switchTo("Habits"); }
     @FXML private void onOpenFinance() { SceneManager.getInstance().invalidate("Finance"); SceneManager.getInstance().switchTo("Finance"); }
     @FXML private void onOpenFocus() { SceneManager.getInstance().invalidate("Focus"); SceneManager.getInstance().switchTo("Focus"); }
-
+    @FXML private void onOpenAnalytics() { SceneManager.getInstance().invalidate("Analytics"); SceneManager.getInstance().switchTo("Analytics"); }
     @FXML private void onRefresh() { loadDashboardData(); loadNotifications(); loadDailyInsight(); }
 
     @FXML

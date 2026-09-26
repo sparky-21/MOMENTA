@@ -190,6 +190,9 @@ public class ProjectController {
                 return null;
             }
             Project project = isEdit ? existing : new Project();
+            if (!isEdit) {
+                project.setUserId(CurrentUser.getId());
+            }
             project.setTitle(titleField.getText().trim());
             project.setDescription(descriptionArea.getText());
             project.setGoalId(goalBox.getValue() == null ? null : goalBox.getValue().getId());
