@@ -1,11 +1,9 @@
 package com.momenta.utility;
 
-import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -62,10 +60,11 @@ public final class SceneManager {
             // Phase 19: apply the complete MOMENTA palette without CSS.
             MomentaTheme.apply(root, viewName);
 
-            FadeTransition fade = new FadeTransition(Duration.millis(220), root);
-            fade.setFromValue(0);
-            fade.setToValue(1);
-            fade.play();
+            // Phase 20: centralized page-entry animation.
+            AnimationUtil.fadeIn(root, 220);
+
+            // Phase 21: install Ctrl+K once on the application's Scene.
+            CommandPalette.install(scene);
 
         } catch (RuntimeException e) {
             AlertUtil.showError("Navigation error", "Could not open " + viewName + ".", e);
@@ -76,7 +75,14 @@ public final class SceneManager {
     public void invalidate(String viewName) {
         viewCache.remove(viewName);
     }
-
+    /**
+     * Drops every cached view. Used after a Settings change (Phase 23) so theme,
+     * accent, font scale and compact-mode updates are picked up by every screen
+     * the next time it is opened, not just the one currently on screen.
+     */
+    public void invalidateAll() {
+        viewCache.clear();
+    }
     private void bindRootToScene(Parent root) {
         if (!(root instanceof javafx.scene.layout.Region region) || scene == null) {
             return;

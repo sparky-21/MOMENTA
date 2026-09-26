@@ -2,6 +2,7 @@ package com.momenta.controller;
 
 import com.momenta.model.User;
 import com.momenta.service.UserService;
+import com.momenta.service.SettingsService;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
 import javafx.fxml.FXML;
@@ -21,8 +22,9 @@ public class LoginController {
         try {
             User user = userService.login(usernameField.getText(), passwordField.getText());
             CurrentUser.login(user);
-            SceneManager.getInstance().invalidate("Dashboard");
-            SceneManager.getInstance().switchTo("Dashboard");
+            String landingView = SettingsService.getLandingView();
+            SceneManager.getInstance().invalidate(landingView);
+            SceneManager.getInstance().switchTo(landingView);
         } catch (IllegalArgumentException e) {
             messageLabel.setText(e.getMessage());
         } catch (RuntimeException e) {

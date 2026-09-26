@@ -1,7 +1,10 @@
 package com.momenta.controller;
 
+import com.momenta.utility.AnimationUtil;
 import javafx.concurrent.Task;
 import com.momenta.model.Notification;
+import com.momenta.model.GamificationStats;
+import com.momenta.service.GamificationService;
 import com.momenta.network.InsightService;
 import com.momenta.network.Quote;
 import com.momenta.service.GoalService;
@@ -12,14 +15,11 @@ import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
-import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.*;
-import javafx.util.Duration;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -49,21 +49,36 @@ public class DashboardController {
     @FXML private VBox nowCard;
     @FXML private Label insightLabel;
     @FXML private Label insightAuthorLabel;
+    @FXML private VBox gamificationCard;
+    @FXML private Label levelLabel;
+    @FXML private Label xpLabel;
+    @FXML private ProgressBar xpProgressBar;
+    @FXML private Label streakLabel;
+    @FXML private Label achievementLabel;
 
     private final TaskService taskService = new TaskService();
     private final GoalService goalService = new GoalService();
     private final ProjectService projectService = new ProjectService();
     private final NotificationService notificationService = new NotificationService();
     private final InsightService insightService = new InsightService();
+    private final GamificationService gamificationService = new GamificationService();
 
     @FXML
     public void initialize() {
         greetingLabel.setText(greetingForNow());
         notificationList.setPrefHeight(120);
         notificationList.setPlaceholder(new Label("No notifications yet."));
+
+        // Phase 20: cards enter with a small, sequential animation.
+        javafx.application.Platform.runLater(() ->
+                AnimationUtil.playSequentialEntry(List.of(
+                        pulseCard, taskCard, goalCard, projectCard, nowCard,
+                        gamificationCard, insightLabel)));
+
         loadDashboardData();
         loadNotifications();
         loadDailyInsight();
+        loadGamification();
     }
 
     private void loadDashboardData() {
@@ -108,10 +123,46 @@ public class DashboardController {
                 ? "No deadline set" : "Deadline: " + rec.getDeadline());
         List<String> reasons = com.momenta.engine.PriorityEngine.score(rec).getReasons();
         nowReasonsLabel.setText("• " + String.join("\n• ", reasons.isEmpty() ? List.of("Standard priority") : reasons));
-        nowProgressBar.setProgress(rec.getProgress() / 100.0);
+        AnimationUtil.animateProgress(nowProgressBar, rec.getProgress() / 100.0);
         nowProgressPercentLabel.setText(rec.getProgress() + "%");
         pulseLabel.setText(String.valueOf(rec.getPriorityScore()));
-        fadeIn(nowTitleLabel);
+        AnimationUtil.fadeIn(nowTitleLabel, 180);
+    }
+
+    private void loadGamification() {
+        final int uid = CurrentUser.getId();
+
+        Task<GamificationStats> task = new Task<>() {
+            @Override
+            protected GamificationStats call() {
+                return gamificationService.calculate(uid);
+            }
+        };
+
+        task.setOnSucceeded(e -> applyGamification(task.getValue()));
+        task.setOnFailed(e -> {
+            levelLabel.setText("LEVEL —");
+            xpLabel.setText("Gamification unavailable");
+            achievementLabel.setText("");
+        });
+
+        TaskExecutor.getInstance().workPool().submit(task);
+    }
+
+    private void applyGamification(GamificationStats stats) {
+        levelLabel.setText("LEVEL " + String.format("%02d", stats.getLevel()));
+        xpLabel.setText(stats.getXpIntoLevel() + " / " + stats.getXpForNextLevel()
+                + " XP to next level  •  " + stats.getTotalXp() + " total");
+        AnimationUtil.animateProgress(xpProgressBar, stats.getProgress());
+        streakLabel.setText("🔥 " + stats.getCurrentStreak() + " day streak");
+
+        long unlocked = stats.getUnlockedAchievementCount();
+        achievementLabel.setText(unlocked + " / " + stats.getAchievements().size()
+                + " achievements unlocked");
+
+        if (unlocked > 0) {
+            AnimationUtil.pulse(gamificationCard);
+        }
     }
 
     private void loadNotifications() {
@@ -164,7 +215,8 @@ public class DashboardController {
     @FXML private void onOpenFinance() { SceneManager.getInstance().invalidate("Finance"); SceneManager.getInstance().switchTo("Finance"); }
     @FXML private void onOpenFocus() { SceneManager.getInstance().invalidate("Focus"); SceneManager.getInstance().switchTo("Focus"); }
     @FXML private void onOpenAnalytics() { SceneManager.getInstance().invalidate("Analytics"); SceneManager.getInstance().switchTo("Analytics"); }
-    @FXML private void onRefresh() { loadDashboardData(); loadNotifications(); loadDailyInsight(); }
+    @FXML private void onOpenSettings() { SceneManager.getInstance().invalidate("Settings"); SceneManager.getInstance().switchTo("Settings"); }
+    @FXML private void onRefresh() { loadDashboardData(); loadNotifications(); loadDailyInsight(); loadGamification(); }
 
     @FXML
     private void onRefreshInsight() {
@@ -199,13 +251,6 @@ public class DashboardController {
         if (hour < 12) return "Good morning";
         if (hour < 17) return "Good afternoon";
         return "Good evening";
-    }
-
-    private void fadeIn(Node node) {
-        FadeTransition fade = new FadeTransition(Duration.millis(300), node);
-        fade.setFromValue(0.3);
-        fade.setToValue(1);
-        fade.play();
     }
 
     private record DashboardData(int incompleteCount, com.momenta.model.Task recommendation, int activeGoals, int activeProjects) {}

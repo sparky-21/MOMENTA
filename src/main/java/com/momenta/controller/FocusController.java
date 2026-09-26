@@ -5,6 +5,7 @@ import com.momenta.model.Task;
 import com.momenta.service.FocusSessionService;
 import com.momenta.service.TaskService;
 import com.momenta.utility.AlertUtil;
+import com.momenta.utility.AnimationUtil;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
 import javafx.animation.Timeline;
@@ -156,6 +157,7 @@ public class FocusController {
         try {
             focusService.finish(activeSession, activeTask);
             statusLabel.setText("Focus session completed");
+            AnimationUtil.success(statusLabel);
             loadTasks();
             loadHistory();
         } catch (RuntimeException ex) {

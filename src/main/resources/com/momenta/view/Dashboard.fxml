@@ -38,7 +38,7 @@
                 <Button text="Focus" maxWidth="Infinity" onAction="#onOpenFocus"/>
                 <Button text="Analytics" maxWidth="Infinity" onAction="#onOpenAnalytics"/>
                 <Separator/>
-                <Button text="Settings" maxWidth="Infinity" disable="true"/>
+                <Button text="Settings" maxWidth="Infinity" onAction="#onOpenSettings"/>
             </children>
             <padding><Insets top="20" right="14" bottom="20" left="14"/></padding>
         </VBox>
@@ -94,6 +94,25 @@
                             </children>
                         </VBox>
                     </GridPane>
+
+                    <VBox fx:id="gamificationCard" spacing="8" maxWidth="Infinity">
+                        <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="MOMENTA LEVEL">
+                                <font><Font name="System Bold" size="16"/></font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="levelLabel" text="LEVEL —">
+                                <font><Font name="System Bold" size="18"/></font>
+                            </Label>
+                        </HBox>
+                        <Label fx:id="xpLabel" text="Loading XP..." wrapText="true"/>
+                        <ProgressBar fx:id="xpProgressBar" progress="0" prefHeight="14" maxWidth="Infinity"/>
+                        <HBox spacing="18" alignment="CENTER_LEFT">
+                            <Label fx:id="streakLabel" text="🔥 0 day streak"/>
+                            <Label fx:id="achievementLabel" text="0 / 7 achievements unlocked"/>
+                        </HBox>
+                    </VBox>
 
                     <VBox fx:id="nowCard" spacing="10" maxWidth="Infinity">
                         <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
