@@ -5,6 +5,7 @@ import com.momenta.model.Task;
 import com.momenta.service.FocusSessionService;
 import com.momenta.service.TaskService;
 import com.momenta.utility.AlertUtil;
+import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -16,7 +17,6 @@ import java.util.List;
 
 /** Phase 9 — Focus Mode controller. UI work stays on the JavaFX thread. */
 public class FocusController {
-    private static final int USER_ID = 1;
 
     @FXML private ComboBox<Task> taskCombo;
     @FXML private Spinner<Integer> durationSpinner;
@@ -66,10 +66,11 @@ public class FocusController {
     }
 
     private void loadTasks() {
+        final int uid = CurrentUser.getId();
         javafx.concurrent.Task<List<Task>> loadTask = new javafx.concurrent.Task<>() {
             @Override
             protected List<Task> call() {
-                return taskService.getIncompleteTasks(USER_ID);
+                return taskService.getIncompleteTasks(uid);
             }
         };
         loadTask.setOnSucceeded(e -> taskCombo.getItems().setAll(loadTask.getValue()));
@@ -79,10 +80,11 @@ public class FocusController {
     }
 
     private void loadHistory() {
+        final int uid = CurrentUser.getId();
         javafx.concurrent.Task<List<FocusSession>> loadTask = new javafx.concurrent.Task<>() {
             @Override
             protected List<FocusSession> call() {
-                return focusService.getHistory(USER_ID);
+                return focusService.getHistory(uid);
             }
         };
         loadTask.setOnSucceeded(e -> historyTable.getItems().setAll(loadTask.getValue()));
@@ -92,7 +94,7 @@ public class FocusController {
     }
 
     private String findTaskTitle(int taskId) {
-        return taskService.getAllTasks(USER_ID).stream()
+        return taskService.getAllTasks(CurrentUser.getId()).stream()
                 .filter(t -> t.getId() == taskId)
                 .map(Task::getTitle)
                 .findFirst().orElse("Task #" + taskId);
@@ -104,7 +106,7 @@ public class FocusController {
         activeTask = taskCombo.getValue();
         int minutes = durationSpinner.getValue();
         try {
-            activeSession = focusService.start(USER_ID, activeTask, minutes);
+            activeSession = focusService.start(CurrentUser.getId(), activeTask, minutes);
             remainingSeconds = minutes * 60;
             running = true;
             statusLabel.setText("Focus session running");

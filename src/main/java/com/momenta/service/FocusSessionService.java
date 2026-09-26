@@ -12,6 +12,7 @@ import java.util.List;
 public class FocusSessionService {
     private final FocusSessionDAO dao = new FocusSessionDAOImpl();
     private final TaskService taskService = new TaskService();
+    private final NotificationService notificationService = new NotificationService();
 
     public FocusSession start(int userId, Task task, int durationMinutes) {
         if (durationMinutes <= 0) throw new IllegalArgumentException("Duration must be greater than zero.");
@@ -20,6 +21,9 @@ public class FocusSessionService {
 
     public void finish(FocusSession session, Task task) {
         dao.finish(session.getId(), LocalDateTime.now().toString());
+        notificationService.create(session.getUserId(), "FOCUS",
+                task == null ? "Focus session completed."
+                        : "Focus session completed for \"" + task.getTitle() + "\".");
         if (task != null && !"COMPLETED".equals(task.getStatus())) {
             int newProgress = Math.min(100, task.getProgress() + progressForSession(task, session.getDurationMinutes()));
             task.setProgress(newProgress);

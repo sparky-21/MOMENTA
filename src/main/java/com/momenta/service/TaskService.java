@@ -3,6 +3,7 @@ package com.momenta.service;
 import com.momenta.dao.TaskDAO;
 import com.momenta.dao.impl.TaskDAOImpl;
 import com.momenta.engine.PriorityEngine;
+import com.momenta.engine.MomentaCore;
 import com.momenta.model.Task;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.List;
 public class TaskService {
 
     private final TaskDAO taskDAO = new TaskDAOImpl();
+    private final NotificationService notificationService = new NotificationService();
 
     public Task createTask(Task task) {
         recalculatePriority(task);
@@ -42,6 +44,8 @@ public class TaskService {
         task.setProgress(100);
         task.setCompletedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         taskDAO.update(task);
+        notificationService.create(task.getUserId(), "TASK",
+                "Task \"" + task.getTitle() + "\" completed.");
     }
 
     public List<Task> getAllTasks(int userId) {
@@ -62,5 +66,15 @@ public class TaskService {
         task.setPriorityScore(result.getScore());
     }
 
+    /**
+     * MOMENTA NOW (Section 16): ranks all incomplete tasks by priority score
+     * and returns the single best candidate to focus on right now, or null
+     * if there is nothing incomplete.
+     */
+    public Task getMomentaNowRecommendation(int userId) {
+        MomentaCore.Recommendation recommendation =
+                new MomentaCore().recommend(userId);
 
+        return recommendation == null ? null : recommendation.task();
+    }
 }

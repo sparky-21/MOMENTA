@@ -21,6 +21,14 @@ public final class AlertUtil {
     public static void showError(String title, String userMessage, Throwable technical) {
         if (technical != null) {
             System.err.println("[" + title + "] " + technical.getMessage());
+            Throwable root = technical;
+            while (root.getCause() != null && root.getCause() != root) {
+                root = root.getCause();
+            }
+            if (root != technical) {
+                System.err.println("  Caused by: " + root);
+            }
+            technical.printStackTrace();
         }
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

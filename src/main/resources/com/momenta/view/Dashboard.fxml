@@ -3,197 +3,140 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<BorderPane fx:id="root" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.momenta.controller.DashboardController">
 
-    <!-- ================= SIDEBAR ================= -->
     <left>
-        <VBox spacing="6" prefWidth="200">
-            <padding>
-                <Insets top="20" right="12" bottom="20" left="12"/>
-            </padding>
-
-            <Label text="MOMENTA">
-                <font>
-                    <Font name="System Bold" size="22"/>
-                </font>
-            </Label>
-
-            <Label text="Personal Operating System" wrapText="true"/>
-
-            <Separator/>
-
-            <Button text="Overview" maxWidth="Infinity"/>
-            <Button text="Tasks" maxWidth="Infinity" onAction="#onOpenTasks"/>
-            <Button text="Goals" maxWidth="Infinity" onAction="#onOpenGoals"/>
-            <Button text="Projects" maxWidth="Infinity" onAction="#onOpenProjects"/>
-            <Button text="Calendar" maxWidth="Infinity" onAction="#onOpenCalendar"/>
-
-            <!-- PHASE 7 -->
-            <Button text="Habits"
-                    maxWidth="Infinity"
-                    onAction="#onOpenHabits"/>
-
-            <!-- PHASE 8 -->
-            <Button text="Finance"
-                    maxWidth="Infinity"
-                    onAction="#onOpenFinance"/>
-
-            <!-- PHASE 9 -->
-            <Button text="Focus"
-                    maxWidth="Infinity"
-                    onAction="#onOpenFocus"/>
-            <Button text="Analytics" maxWidth="Infinity" disable="true"/>
-
-            <Separator/>
-
-            <Button text="Settings" maxWidth="Infinity" disable="true"/>
+        <VBox fx:id="sidebar" spacing="7" prefWidth="215">
+            <children>
+                <Label text="MOMENTA" textFill="WHITE">
+                    <font><Font name="System Bold" size="24"/></font>
+                </Label>
+                <Label text="Personal Operating System" textFill="#EAFBF8" wrapText="true"/>
+                <Separator/>
+                <Button text="Overview" maxWidth="Infinity"/>
+                <Button text="Tasks" maxWidth="Infinity" onAction="#onOpenTasks"/>
+                <Button text="Goals" maxWidth="Infinity" onAction="#onOpenGoals"/>
+                <Button text="Projects" maxWidth="Infinity" onAction="#onOpenProjects"/>
+                <Button text="Calendar" maxWidth="Infinity" onAction="#onOpenCalendar"/>
+                <Button text="Habits" maxWidth="Infinity" onAction="#onOpenHabits"/>
+                <Button text="Finance" maxWidth="Infinity" onAction="#onOpenFinance"/>
+                <Button text="Focus" maxWidth="Infinity" onAction="#onOpenFocus"/>
+                <Button text="Analytics" maxWidth="Infinity" disable="true"/>
+                <Separator/>
+                <Button text="Settings" maxWidth="Infinity" disable="true"/>
+            </children>
+            <padding><Insets top="20" right="14" bottom="20" left="14"/></padding>
         </VBox>
     </left>
 
-    <!-- ================= MAIN CONTENT ================= -->
     <center>
-        <VBox spacing="18">
-            <padding>
-                <Insets top="24" right="28" bottom="24" left="28"/>
-            </padding>
+        <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true">
+            <content>
+                <VBox spacing="18" fillWidth="true">
+                    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <Label fx:id="greetingLabel" text="Good afternoon">
+                            <font><Font name="System Bold" size="27"/></font>
+                        </Label>
+                        <Button text="Refresh" onAction="#onRefresh"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Notifications" onAction="#onOpenNotifications"/>
+                        <Label fx:id="notificationCountLabel" text="0"/>
+                    </HBox>
+                    <Separator/>
 
-            <HBox spacing="10" alignment="CENTER_LEFT">
+                    <GridPane hgap="14" vgap="14" maxWidth="Infinity">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <rowConstraints><RowConstraints vgrow="NEVER"/></rowConstraints>
 
-                <Label fx:id="greetingLabel" text="Good afternoon">
-                    <font>
-                        <Font name="System Bold" size="26"/>
-                    </font>
-                </Label>
+                        <VBox fx:id="pulseCard" GridPane.columnIndex="0" maxWidth="Infinity">
+                            <children>
+                                <Label text="MOMENTA PULSE"/>
+                                <Label fx:id="pulseLabel" text="—"><font><Font name="System Bold" size="28"/></font></Label>
+                            </children>
+                        </VBox>
+                        <VBox fx:id="taskCard" GridPane.columnIndex="1" maxWidth="Infinity">
+                            <children>
+                                <Label text="INCOMPLETE TASKS"/>
+                                <Label fx:id="taskCountLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
+                            </children>
+                        </VBox>
+                        <VBox fx:id="goalCard" GridPane.columnIndex="2" maxWidth="Infinity">
+                            <children>
+                                <Label text="ACTIVE GOALS"/>
+                                <Label fx:id="goalCountLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
+                            </children>
+                        </VBox>
+                        <VBox fx:id="projectCard" GridPane.columnIndex="3" maxWidth="Infinity">
+                            <children>
+                                <Label text="ACTIVE PROJECTS"/>
+                                <Label fx:id="projectCountLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
+                            </children>
+                        </VBox>
+                    </GridPane>
 
-                <Button text="Refresh" onAction="#onRefresh"/>
+                    <VBox spacing="10" maxWidth="Infinity">
+                        <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                        <Label text="MOMENTA NOW">
+                            <font><Font name="System Bold" size="19"/></font>
+                        </Label>
+                        <Label fx:id="nowTitleLabel" text="Loading..." wrapText="true">
+                            <font><Font name="System Bold" size="20"/></font>
+                        </Label>
+                        <Label fx:id="nowPriorityLabel" text=""/>
+                        <Label fx:id="nowDeadlineLabel" text=""/>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <ProgressBar fx:id="nowProgressBar" progress="0" prefHeight="16" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="nowProgressPercentLabel" text="0%" minWidth="42"/>
+                        </HBox>
+                        <Label text="Why?"><font><Font name="System Bold" size="13"/></font></Label>
+                        <Label fx:id="nowReasonsLabel" text="" wrapText="true"/>
+                        <Button text="Open Tasks" onAction="#onOpenTasks" maxWidth="160"/>
+                    </VBox>
 
-            </HBox>
+                    <VBox spacing="10" maxWidth="Infinity">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Recent Notifications"><font><Font name="System Bold" size="17"/></font></Label>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Mark all as read" onAction="#onMarkAllNotificationsRead"/>
+                        </HBox>
+                        <ListView fx:id="notificationList" maxWidth="Infinity"/>
+                    </VBox>
 
-            <Separator/>
-
-            <!-- Stat cards row -->
-            <HBox spacing="16">
-
-                <TitledPane text="MOMENTA PULSE"
-                            collapsible="false"
-                            prefWidth="220">
-
-                    <Label fx:id="pulseLabel" text="—">
-                        <font>
-                            <Font name="System Bold" size="28"/>
-                        </font>
-                    </Label>
-
-                </TitledPane>
-
-                <TitledPane text="INCOMPLETE TASKS"
-                            collapsible="false"
-                            prefWidth="220">
-
-                    <Label fx:id="taskCountLabel" text="0">
-                        <font>
-                            <Font name="System Bold" size="28"/>
-                        </font>
-                    </Label>
-
-                </TitledPane>
-
-                <TitledPane text="ACTIVE GOALS"
-                            collapsible="false"
-                            prefWidth="220">
-
-                    <Label fx:id="goalCountLabel" text="0">
-                        <font>
-                            <Font name="System Bold" size="28"/>
-                        </font>
-                    </Label>
-
-                </TitledPane>
-
-                <TitledPane text="ACTIVE PROJECTS"
-                            collapsible="false"
-                            prefWidth="220">
-
-                    <Label fx:id="projectCountLabel" text="0">
-                        <font>
-                            <Font name="System Bold" size="28"/>
-                        </font>
-                    </Label>
-
-                </TitledPane>
-
-            </HBox>
-
-            <Separator/>
-
-            <!-- MOMENTA NOW -->
-            <TitledPane text="MOMENTA NOW ⚡"
-                        collapsible="false">
-
-                <VBox spacing="8">
-
-                    <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
-                    </padding>
-
-                    <Label fx:id="nowTitleLabel"
-                           text="Loading...">
-
-                        <font>
-                            <Font name="System Bold" size="20"/>
-                        </font>
-
-                    </Label>
-
-                    <Label fx:id="nowPriorityLabel"
-                           text=""/>
-
-                    <Label fx:id="nowDeadlineLabel"
-                           text=""/>
-
-                    <ProgressBar fx:id="nowProgressBar"
-                                 progress="0"
-                                 prefWidth="300"/>
-
-                    <Label text="Why?">
-                        <font>
-                            <Font name="System Bold" size="13"/>
-                        </font>
-                    </Label>
-
-                    <Label fx:id="nowReasonsLabel"
-                           text=""
-                           wrapText="true"/>
-
-                    <Button text="Open Tasks"
-                            onAction="#onOpenTasks"/>
-
+                    <VBox fx:id="insightCard" spacing="8" maxWidth="Infinity">
+                        <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="DAILY PRODUCTIVITY INSIGHT"><font><Font name="System Bold" size="14"/></font></Label>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Refresh Insight" onAction="#onRefreshInsight"/>
+                        </HBox>
+                        <Label fx:id="insightLabel" text="Loading daily insight..." wrapText="true">
+                            <font><Font size="14"/></font>
+                        </Label>
+                        <Label fx:id="insightAuthorLabel" text="" wrapText="true"/>
+                    </VBox>
                 </VBox>
-
-            </TitledPane>
-
-            <TitledPane text="DAILY PRODUCTIVITY INSIGHT" collapsible="false">
-                <VBox spacing="8">
-                    <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
-                    </padding>
-                    <Label fx:id="insightLabel" text="Loading daily insight..." wrapText="true"/>
-                    <Label fx:id="insightAuthorLabel" text="" wrapText="true"/>
-                    <Button text="Refresh Insight" onAction="#onRefreshInsight"/>
-                </VBox>
-            </TitledPane>
-
-        </VBox>
+            </content>
+        </ScrollPane>
     </center>
-
 </BorderPane>
