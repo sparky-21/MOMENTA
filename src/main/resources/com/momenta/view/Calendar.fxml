@@ -19,7 +19,7 @@
             fx:controller="com.momenta.controller.CalendarController">
 
     <top>
-        <VBox spacing="10" fillWidth="true">
+        <VBox id="workspaceHeader" spacing="10" fillWidth="true">
             <padding><Insets top="18" right="22" bottom="10" left="22"/></padding>
             <FlowPane hgap="10" vgap="8" prefWrapLength="850" maxWidth="Infinity" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
@@ -45,7 +45,7 @@
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true">
+        <ScrollPane id="workspaceBody" fitToWidth="true" fitToHeight="true" pannable="true">
             <content>
                 <VBox spacing="0" fillWidth="true">
                     <padding><Insets top="8" right="22" bottom="22" left="22"/></padding>

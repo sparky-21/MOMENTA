@@ -112,6 +112,30 @@ public final class AnimationUtil {
         timeline.play();
     }
 
+    public static void workspaceEntry(List<? extends Node> nodes) {
+        if (nodes == null || nodes.isEmpty()) return;
+
+        SequentialTransition sequence = new SequentialTransition();
+        for (Node node : nodes) {
+            if (node == null) continue;
+            node.setOpacity(0);
+            node.setTranslateY(10);
+
+            FadeTransition fade = new FadeTransition(Duration.millis(180), node);
+            fade.setFromValue(0);
+            fade.setToValue(1);
+
+            TranslateTransition slide = new TranslateTransition(Duration.millis(220), node);
+            slide.setFromY(10);
+            slide.setToY(0);
+            slide.setInterpolator(Interpolator.EASE_OUT);
+
+            sequence.getChildren().add(new ParallelTransition(fade, slide));
+        }
+        sequence.setDelay(Duration.millis(45));
+        sequence.play();
+    }
+
     public static void playSequentialEntry(List<? extends Node> nodes) {
         if (nodes == null || nodes.isEmpty()) return;
 

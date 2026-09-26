@@ -21,7 +21,7 @@
             fx:controller="com.momenta.controller.FinanceController">
 
     <top>
-        <VBox spacing="10" fillWidth="true">
+        <VBox id="workspaceHeader" spacing="10" fillWidth="true">
             <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
@@ -30,19 +30,19 @@
                 </Label>
             </HBox>
             <FlowPane hgap="18" vgap="8" prefWrapLength="760" maxWidth="Infinity" alignment="CENTER_LEFT">
-                <VBox minWidth="140">
+                <VBox id="financeIncomeCard" minWidth="140">
                     <Label text="Income"/>
                     <Label fx:id="incomeLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
-                <VBox minWidth="140">
+                <VBox id="financeExpenseCard" minWidth="140">
                     <Label text="Expenses"/>
                     <Label fx:id="expenseLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
-                <VBox minWidth="140">
+                <VBox id="financeBalanceCard" minWidth="140">
                     <Label text="Balance"/>
                     <Label fx:id="balanceLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
-                <VBox minWidth="140">
+                <VBox id="financeSavingsCard" minWidth="140">
                     <Label text="Savings Rate"/>
                     <Label fx:id="savingsLabel" text="0.0%"><font><Font name="System Bold" size="16"/></font></Label>
                 </VBox>
@@ -59,7 +59,7 @@
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
+        <ScrollPane id="workspaceBody" fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
             <content>
                 <GridPane hgap="16" vgap="16" maxWidth="Infinity">
                     <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>

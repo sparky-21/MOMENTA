@@ -16,7 +16,7 @@
             fx:controller="com.momenta.controller.GoalController">
 
     <top>
-        <VBox spacing="10" fillWidth="true">
+        <VBox id="workspaceHeader" spacing="10" fillWidth="true">
             <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
@@ -35,7 +35,7 @@
     </top>
 
     <center>
-        <VBox fillWidth="true">
+        <VBox id="workspaceBody" fillWidth="true">
             <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
             <TableView fx:id="goalTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
                 <columns>

@@ -390,9 +390,9 @@ public class CalendarController {
 
 
             label.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 13));
-            label.setTextFill(com.momenta.utility.MomentaTheme.SEA_GREEN);
+            label.setTextFill(com.momenta.utility.MomentaTheme.SKY_BLUE);
             label.setBackground(new Background(new BackgroundFill(
-                    com.momenta.utility.MomentaTheme.MINT, new CornerRadii(8), Insets.EMPTY)));
+                    com.momenta.utility.MomentaTheme.SURFACE_3, new CornerRadii(8), Insets.EMPTY)));
 
 
             calendarGrid.add(
@@ -443,11 +443,11 @@ public class CalendarController {
 
 
         Color background = currentMonth
-                ? Color.WHITE
-                : Color.web("#EEF4F6");
+                ? com.momenta.utility.MomentaTheme.SURFACE_2
+                : com.momenta.utility.MomentaTheme.SURFACE;
         Color border = selected
-                ? com.momenta.utility.MomentaTheme.SEA_GREEN
-                : Color.web("#D8E2E5");
+                ? com.momenta.utility.MomentaTheme.SKY_BLUE
+                : com.momenta.utility.MomentaTheme.BORDER_SOFT;
         double borderWidth = selected ? 2 : 1;
 
         cell.setBackground(new Background(new BackgroundFill(
@@ -468,10 +468,10 @@ public class CalendarController {
 
 
         dayNumber.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 13));
-        dayNumber.setTextFill(today ? Color.WHITE : com.momenta.utility.MomentaTheme.CHARCOAL);
+        dayNumber.setTextFill(today ? com.momenta.utility.MomentaTheme.VOID : com.momenta.utility.MomentaTheme.TEXT_2);
         if (today) {
             dayNumber.setBackground(new Background(new BackgroundFill(
-                    com.momenta.utility.MomentaTheme.SEA_GREEN, new CornerRadii(10), Insets.EMPTY)));
+                    com.momenta.utility.MomentaTheme.SKY_BLUE, new CornerRadii(10), Insets.EMPTY)));
         }
 
 
@@ -560,11 +560,11 @@ public class CalendarController {
 
 
             eventButton.setFont(Font.font("System", 11));
-            eventButton.setTextFill(com.momenta.utility.MomentaTheme.SEA_GREEN);
+            eventButton.setTextFill(com.momenta.utility.MomentaTheme.SKY_BLUE);
             eventButton.setBackground(new Background(new BackgroundFill(
-                    com.momenta.utility.MomentaTheme.MINT, new CornerRadii(6), Insets.EMPTY)));
+                    com.momenta.utility.MomentaTheme.SURFACE_3, new CornerRadii(6), Insets.EMPTY)));
             eventButton.setBorder(new Border(new BorderStroke(
-                    com.momenta.utility.MomentaTheme.SEA_GREEN, BorderStrokeStyle.SOLID,
+                    com.momenta.utility.MomentaTheme.SKY_BLUE, BorderStrokeStyle.SOLID,
                     new CornerRadii(6), new BorderWidths(1))));
 
 
@@ -612,7 +612,7 @@ public class CalendarController {
 
 
             taskLabel.setFont(Font.font("System", 11));
-            taskLabel.setTextFill(com.momenta.utility.MomentaTheme.CHARCOAL);
+            taskLabel.setTextFill(com.momenta.utility.MomentaTheme.TEXT_2);
 
 
             cell.getChildren().add(

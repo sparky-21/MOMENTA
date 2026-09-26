@@ -25,7 +25,7 @@ import java.util.Optional;
  * computes it fresh on every load, so unlike Task/Goal there's nothing to
  * "keep in sync" here.
  */
-public class ProjectController {
+public class ProjectController extends AbstractScreenController {
 
     @FXML private TableView<Project> projectTable;
     @FXML private TableColumn<Project, String> titleColumn;
@@ -55,6 +55,12 @@ public class ProjectController {
         });
 
         projectTable.setItems(projects);
+        refresh();
+    }
+
+    /** {@inheritDoc} For Projects, "refresh" means reloading projects + the goal picker. */
+    @Override
+    protected void refresh() {
         loadProjects();
     }
 
@@ -129,19 +135,6 @@ public class ProjectController {
     private void onBackToDashboard() {
         SceneManager.getInstance().invalidate("Dashboard");
         SceneManager.getInstance().switchTo("Dashboard");
-    }
-
-    private <T> void runInBackground(java.util.concurrent.Callable<T> work, java.util.function.Consumer<T> onDone) {
-        javafx.concurrent.Task<T> bgTask = new javafx.concurrent.Task<>() {
-            @Override
-            protected T call() throws Exception {
-                return work.call();
-            }
-        };
-        bgTask.setOnSucceeded(e -> onDone.accept(bgTask.getValue()));
-        bgTask.setOnFailed(e -> AlertUtil.showError("Operation failed",
-                "Something went wrong while saving. Please try again.", bgTask.getException()));
-        TaskExecutor.getInstance().workPool().submit(bgTask);
     }
 
     private Optional<Project> showProjectDialog(Project existing) {

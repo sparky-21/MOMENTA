@@ -16,10 +16,10 @@
     <AnchorPane maxWidth="Infinity" maxHeight="Infinity"/>
     <VBox fx:id="loginCard" alignment="CENTER" spacing="14" maxWidth="430" minWidth="300">
         <padding><Insets top="36" right="42" bottom="36" left="42"/></padding>
-        <Label text="MOMENTA">
+        <Label text="MOMENTA" fx:id="loginBrand">
             <font><Font name="System Bold" size="36"/></font>
         </Label>
-        <Label text="One place to run your life." wrapText="true"/>
+        <Label text="One place to run your life." fx:id="loginSubtitle" wrapText="true"/>
         <Label fx:id="messageLabel" text="" wrapText="true" maxWidth="380"/>
         <TextField fx:id="usernameField" promptText="Username" maxWidth="Infinity"/>
         <PasswordField fx:id="passwordField" promptText="Password" maxWidth="Infinity"/>

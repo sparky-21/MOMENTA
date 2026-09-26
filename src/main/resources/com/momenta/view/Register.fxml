@@ -20,9 +20,14 @@
         <content>
             <VBox fx:id="registerCard" alignment="CENTER" spacing="12" maxWidth="450">
                 <padding><Insets top="35" right="40" bottom="35" left="40"/></padding>
-                <Label text="Create your MOMENTA account" wrapText="true">
-                    <font><Font name="System Bold" size="24"/></font>
+                <Label text="MOMENTA" fx:id="registerBrand">
+                    <font><Font name="System Bold" size="32"/></font>
                 </Label>
+                <Label text="CREATE YOUR ACCOUNT" fx:id="registerKicker">
+                    <font><Font name="System Bold" size="12"/></font>
+                </Label>
+                <Label text="Set up your personal operating system." fx:id="registerSubtitle"
+                       wrapText="true" maxWidth="390"/>
                 <TextField fx:id="nameField" promptText="Full name" maxWidth="Infinity"/>
                 <TextField fx:id="usernameField" promptText="Username" maxWidth="Infinity"/>
                 <PasswordField fx:id="passwordField" promptText="Password (minimum 6 characters)" maxWidth="Infinity"/>

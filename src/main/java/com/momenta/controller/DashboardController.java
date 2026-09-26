@@ -2,6 +2,9 @@ package com.momenta.controller;
 
 import com.momenta.utility.AnimationUtil;
 import javafx.concurrent.Task;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import com.momenta.model.Notification;
 import com.momenta.model.GamificationStats;
 import com.momenta.service.GamificationService;
@@ -62,12 +65,29 @@ public class DashboardController {
     private final NotificationService notificationService = new NotificationService();
     private final InsightService insightService = new InsightService();
     private final GamificationService gamificationService = new GamificationService();
+    private Timeline greetingClock;
 
     @FXML
     public void initialize() {
         greetingLabel.setText(greetingForNow());
-        notificationList.setPrefHeight(120);
-        notificationList.setPlaceholder(new Label("No notifications yet."));
+        notificationList.setPrefHeight(105);
+        notificationList.setMinHeight(90);
+        notificationList.setPlaceholder(new Label("✦  No notifications yet"));
+
+        // Keep the greeting synchronized with the actual time while the
+        // dashboard remains open. The timer stops automatically when this
+        // view leaves the scene, avoiding a background controller leak.
+        greetingClock = new Timeline(new KeyFrame(Duration.seconds(60), e ->
+                greetingLabel.setText(greetingForNow())));
+        greetingClock.setCycleCount(Timeline.INDEFINITE);
+        root.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                greetingLabel.setText(greetingForNow());
+                greetingClock.play();
+            } else {
+                greetingClock.stop();
+            }
+        });
 
         // Phase 20: cards enter with a small, sequential animation.
         javafx.application.Platform.runLater(() ->
@@ -216,7 +236,13 @@ public class DashboardController {
     @FXML private void onOpenFocus() { SceneManager.getInstance().invalidate("Focus"); SceneManager.getInstance().switchTo("Focus"); }
     @FXML private void onOpenAnalytics() { SceneManager.getInstance().invalidate("Analytics"); SceneManager.getInstance().switchTo("Analytics"); }
     @FXML private void onOpenSettings() { SceneManager.getInstance().invalidate("Settings"); SceneManager.getInstance().switchTo("Settings"); }
-    @FXML private void onRefresh() { loadDashboardData(); loadNotifications(); loadDailyInsight(); loadGamification(); }
+    @FXML private void onRefresh() {
+        greetingLabel.setText(greetingForNow());
+        loadDashboardData();
+        loadNotifications();
+        loadDailyInsight();
+        loadGamification();
+    }
 
     @FXML
     private void onRefreshInsight() {

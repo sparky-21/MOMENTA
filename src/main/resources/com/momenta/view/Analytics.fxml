@@ -26,7 +26,7 @@
             fx:controller="com.momenta.controller.AnalyticsController">
 
     <top>
-        <HBox spacing="12" alignment="CENTER_LEFT">
+        <HBox id="workspaceHeader" spacing="12" alignment="CENTER_LEFT">
             <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
             <Label text="MOMENTA ANALYTICS">
                 <font><Font name="System Bold" size="24"/></font>
@@ -38,9 +38,9 @@
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" pannable="true">
+        <ScrollPane id="workspaceBody" fitToWidth="true" pannable="true">
             <content>
-                <VBox spacing="18" fillWidth="true">
+                <VBox id="analyticsContent" spacing="18" fillWidth="true">
                     <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
 
                     <GridPane hgap="14" vgap="14" maxWidth="Infinity">
@@ -49,17 +49,17 @@
                             <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
                             <ColumnConstraints percentWidth="33.333" hgrow="ALWAYS"/>
                         </columnConstraints>
-                        <VBox GridPane.columnIndex="0" spacing="8" maxWidth="Infinity" minWidth="180">
+                        <VBox id="analyticsPulseCard" GridPane.columnIndex="0" spacing="8" maxWidth="Infinity" minWidth="180">
                             <Label text="MOMENTA PULSE"/>
                             <Label fx:id="pulseLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
                             <ProgressBar fx:id="pulseProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
-                        <VBox GridPane.columnIndex="1" spacing="8" maxWidth="Infinity" minWidth="180">
+                        <VBox id="analyticsProductivityCard" GridPane.columnIndex="1" spacing="8" maxWidth="Infinity" minWidth="180">
                             <Label text="PRODUCTIVITY"/>
                             <Label fx:id="productivityLabel" text="0"><font><Font name="System Bold" size="28"/></font></Label>
                             <ProgressBar fx:id="productivityProgress" progress="0" maxWidth="Infinity"/>
                         </VBox>
-                        <VBox GridPane.columnIndex="2" spacing="8" maxWidth="Infinity" minWidth="180">
+                        <VBox id="analyticsHabitCard" GridPane.columnIndex="2" spacing="8" maxWidth="Infinity" minWidth="180">
                             <Label text="HABIT CONSISTENCY"/>
                             <Label fx:id="habitConsistencyLabel" text="0%"><font><Font name="System Bold" size="28"/></font></Label>
                             <ProgressBar fx:id="habitProgress" progress="0" maxWidth="Infinity"/>

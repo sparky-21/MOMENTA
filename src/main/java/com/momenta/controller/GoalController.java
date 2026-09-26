@@ -25,7 +25,7 @@ import java.util.Optional;
  * Phase 5. A TreeTableView upgrade is a clean, isolated later change since
  * nothing about GoalService or GoalDAO would need to move.
  */
-public class GoalController {
+public class GoalController extends AbstractScreenController {
 
     @FXML private TableView<Goal> goalTable;
     @FXML private TableColumn<Goal, String> titleColumn;
@@ -58,6 +58,12 @@ public class GoalController {
         });
 
         goalTable.setItems(goals);
+        refresh();
+    }
+
+    /** {@inheritDoc} For Goals, "refresh" means reloading the goal list. */
+    @Override
+    protected void refresh() {
         loadGoals();
     }
 
@@ -124,19 +130,6 @@ public class GoalController {
     private void onBackToDashboard() {
         SceneManager.getInstance().invalidate("Dashboard");
         SceneManager.getInstance().switchTo("Dashboard");
-    }
-
-    private <T> void runInBackground(java.util.concurrent.Callable<T> work, java.util.function.Consumer<T> onDone) {
-        javafx.concurrent.Task<T> bgTask = new javafx.concurrent.Task<>() {
-            @Override
-            protected T call() throws Exception {
-                return work.call();
-            }
-        };
-        bgTask.setOnSucceeded(e -> onDone.accept(bgTask.getValue()));
-        bgTask.setOnFailed(e -> AlertUtil.showError("Operation failed",
-                "Something went wrong while saving. Please try again.", bgTask.getException()));
-        TaskExecutor.getInstance().workPool().submit(bgTask);
     }
 
     private Optional<Goal> showGoalDialog(Goal existing) {

@@ -8,7 +8,7 @@
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.momenta.controller.FocusController">
     <top>
-        <HBox spacing="12" alignment="CENTER_LEFT">
+        <HBox id="workspaceHeader" spacing="12" alignment="CENTER_LEFT">
             <padding><Insets top="18" right="24" bottom="12" left="24"/></padding>
             <Button text="← Dashboard" onAction="#onBackToDashboard"/>
             <Label text="Focus Mode"><font><Font name="System Bold" size="26"/></font></Label>
@@ -16,7 +16,7 @@
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" pannable="true">
+        <ScrollPane id="workspaceBody" fitToWidth="true" pannable="true">
             <content>
                 <VBox spacing="18" alignment="TOP_CENTER" fillWidth="true">
                     <padding><Insets top="20" right="40" bottom="30" left="40"/></padding>
@@ -28,13 +28,13 @@
                             <font><Font name="System Bold" size="64"/></font>
                         </Label>
                     </VBox>
-                    <FlowPane hgap="10" vgap="10" alignment="CENTER" prefWrapLength="720" maxWidth="Infinity">
+                    <FlowPane id="focusControls" hgap="10" vgap="10" alignment="CENTER" prefWrapLength="720" maxWidth="Infinity">
                         <Label text="Task:"/>
                         <ComboBox fx:id="taskCombo" prefWidth="300" promptText="Choose a task"/>
                         <Label text="Minutes:"/>
                         <Spinner fx:id="durationSpinner" prefWidth="90"/>
                     </FlowPane>
-                    <FlowPane hgap="10" vgap="10" alignment="CENTER" prefWrapLength="720" maxWidth="Infinity">
+                    <FlowPane id="focusControls" hgap="10" vgap="10" alignment="CENTER" prefWrapLength="720" maxWidth="Infinity">
                         <Button text="Start" onAction="#onStart"/>
                         <Button text="Pause" onAction="#onPause"/>
                         <Button text="Resume" onAction="#onResume"/>

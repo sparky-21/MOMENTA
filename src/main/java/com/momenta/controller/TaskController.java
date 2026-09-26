@@ -28,7 +28,7 @@ import java.util.Optional;
  * ObservableList bound to the TableView. All persistence lives in
  * TaskDAOImpl, all scoring logic lives in PriorityEngine.
  */
-public class TaskController {
+public class TaskController extends AbstractScreenController {
 
     @FXML private TableView<Task> taskTable;
     @FXML private TableColumn<Task, String> titleColumn;
@@ -58,6 +58,12 @@ public class TaskController {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         taskTable.setItems(tasks);
+        refresh();
+    }
+
+    /** {@inheritDoc} For Tasks, "refresh" means reloading tasks + the goal/project pickers. */
+    @Override
+    protected void refresh() {
         loadTasks();
     }
 
@@ -171,24 +177,6 @@ public class TaskController {
     private void onBackToDashboard() {
         SceneManager.getInstance().invalidate("Dashboard");
         SceneManager.getInstance().switchTo("Dashboard");
-    }
-
-    /**
-     * Runs {@code work} on the shared background pool and applies
-     * {@code onDone} back on the JavaFX Application Thread — the same
-     * background -> foreground handoff pattern used throughout MOMENTA.
-     */
-    private <T> void runInBackground(java.util.concurrent.Callable<T> work, java.util.function.Consumer<T> onDone) {
-        javafx.concurrent.Task<T> bgTask = new javafx.concurrent.Task<>() {
-            @Override
-            protected T call() throws Exception {
-                return work.call();
-            }
-        };
-        bgTask.setOnSucceeded(e -> onDone.accept(bgTask.getValue()));
-        bgTask.setOnFailed(e -> AlertUtil.showError("Operation failed",
-                "Something went wrong while saving. Please try again.", bgTask.getException()));
-        TaskExecutor.getInstance().workPool().submit(bgTask);
     }
 
     /**

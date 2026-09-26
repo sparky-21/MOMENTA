@@ -19,7 +19,7 @@
             fx:controller="com.momenta.controller.HabitController">
 
     <top>
-        <VBox spacing="10" fillWidth="true">
+        <VBox id="workspaceHeader" spacing="10" fillWidth="true">
             <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="← Dashboard" onAction="#onBackToDashboard"/>
@@ -39,7 +39,7 @@
     </top>
 
     <center>
-        <HBox spacing="16" fillHeight="true">
+        <HBox id="workspaceBody" spacing="16" fillHeight="true">
             <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
             <TableView fx:id="habitTable" onMouseClicked="#onSelectHabit" HBox.hgrow="ALWAYS"
                        minWidth="320" maxWidth="Infinity" maxHeight="Infinity">
@@ -49,7 +49,7 @@
                     <TableColumn fx:id="longestStreakColumn" text="Longest Streak" prefWidth="120"/>
                 </columns>
             </TableView>
-            <VBox spacing="12" prefWidth="260" minWidth="220" maxWidth="320">
+            <VBox id="habitDetailsCard" spacing="12" prefWidth="260" minWidth="220" maxWidth="320">
                 <Label text="Selected Habit">
                     <font><Font name="System Bold" size="16"/></font>
                 </Label>

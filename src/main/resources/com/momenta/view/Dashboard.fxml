@@ -23,22 +23,22 @@
     <left>
         <VBox fx:id="sidebar" spacing="7" prefWidth="215">
             <children>
-                <Label text="MOMENTA" textFill="WHITE">
+                <Label text="MOMENTA" textFill="WHITE" fx:id="sidebarBrand">
                     <font><Font name="System Bold" size="24"/></font>
                 </Label>
-                <Label text="Personal Operating System" textFill="#EAFBF8" wrapText="true"/>
+                <Label text="PERSONAL OPERATING SYSTEM" fx:id="sidebarSub" wrapText="true"/>
                 <Separator/>
-                <Button text="Overview" maxWidth="Infinity"/>
-                <Button text="Tasks" maxWidth="Infinity" onAction="#onOpenTasks"/>
-                <Button text="Goals" maxWidth="Infinity" onAction="#onOpenGoals"/>
-                <Button text="Projects" maxWidth="Infinity" onAction="#onOpenProjects"/>
-                <Button text="Calendar" maxWidth="Infinity" onAction="#onOpenCalendar"/>
-                <Button text="Habits" maxWidth="Infinity" onAction="#onOpenHabits"/>
-                <Button text="Finance" maxWidth="Infinity" onAction="#onOpenFinance"/>
-                <Button text="Focus" maxWidth="Infinity" onAction="#onOpenFocus"/>
-                <Button text="Analytics" maxWidth="Infinity" onAction="#onOpenAnalytics"/>
+                <Button text="◈  Overview" maxWidth="Infinity"/>
+                <Button text="✓  Tasks" maxWidth="Infinity" onAction="#onOpenTasks"/>
+                <Button text="◎  Goals" maxWidth="Infinity" onAction="#onOpenGoals"/>
+                <Button text="▣  Projects" maxWidth="Infinity" onAction="#onOpenProjects"/>
+                <Button text="◫  Calendar" maxWidth="Infinity" onAction="#onOpenCalendar"/>
+                <Button text="↻  Habits" maxWidth="Infinity" onAction="#onOpenHabits"/>
+                <Button text="◒  Finance" maxWidth="Infinity" onAction="#onOpenFinance"/>
+                <Button text="◉  Focus" maxWidth="Infinity" onAction="#onOpenFocus"/>
+                <Button text="⌁  Analytics" maxWidth="Infinity" onAction="#onOpenAnalytics"/>
                 <Separator/>
-                <Button text="Settings" maxWidth="Infinity" onAction="#onOpenSettings"/>
+                <Button text="⚙  Settings" maxWidth="Infinity" onAction="#onOpenSettings"/>
             </children>
             <padding><Insets top="20" right="14" bottom="20" left="14"/></padding>
         </VBox>

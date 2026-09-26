@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" fitToHeight="true" pannable="true"
+<ScrollPane id="settingsRoot" fitToWidth="true" fitToHeight="true" pannable="true"
             xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.momenta.controller.SettingsController">
     <content>
@@ -29,7 +29,7 @@
             <Label fx:id="accountLabel" text="Personal settings"/>
             <Separator/>
 
-            <VBox spacing="12">
+            <VBox id="settingsAppearanceCard" spacing="12">
                 <Label text="Appearance">
                     <font><Font name="System Bold" size="19"/></font>
                 </Label>
@@ -52,7 +52,7 @@
 
             <Separator/>
 
-            <VBox spacing="12">
+            <VBox id="settingsStartupCard" spacing="12">
                 <Label text="Startup">
                     <font><Font name="System Bold" size="19"/></font>
                 </Label>

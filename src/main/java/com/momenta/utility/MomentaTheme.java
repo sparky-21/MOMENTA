@@ -9,10 +9,12 @@ import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.application.Platform;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import java.util.List;
 
 /**
  * MOMENTA visual system.
@@ -40,6 +42,18 @@ public final class MomentaTheme {
     public static final Color PEACH = Color.web("#FDBA74");
     public static final Color SKY_BLUE = Color.web("#67E8F9");
     public static final Color PERIWINKLE = Color.web("#A5B4FC");
+
+    // Module accents — deliberately softer than the core purple so the UI
+    // stays colorful without becoming a neon/gaming interface.
+    public static final Color TASKS_ACCENT = Color.web("#5DADE2");
+    public static final Color GOALS_ACCENT = Color.web("#9B8AFB");
+    public static final Color PROJECTS_ACCENT = Color.web("#A5B4FC");
+    public static final Color HABITS_ACCENT = Color.web("#6BCB9A");
+    public static final Color FINANCE_ACCENT = Color.web("#F4A261");
+    public static final Color FOCUS_ACCENT = Color.web("#E78AC3");
+    public static final Color ANALYTICS_ACCENT = Color.web("#8E9FE6");
+    public static final Color CALENDAR_ACCENT = Color.web("#67E8F9");
+    public static final Color SETTINGS_ACCENT = Color.web("#8B5CF6");
 
     public static final Color TEXT = Color.web("#FAF7FF");
     public static final Color TEXT_2 = Color.web("#DDD3ED");
@@ -112,15 +126,16 @@ public final class MomentaTheme {
         }
 
         return switch (viewName) {
-            case "Tasks", "Calendar" -> ELECTRIC_VIOLET;
-            case "Goals" -> ROYAL_PURPLE;
-            case "Projects" -> NEON_LILAC;
-            case "Habits" -> SOFT_GREEN;
-            case "Finance" -> PEACH;
-            case "Focus" -> PINK;
-            case "Analytics" -> PERIWINKLE;
-            case "Home", "Login", "Register", "Settings" -> ROYAL_PURPLE;
-            default -> ROYAL_PURPLE;
+            case "Tasks" -> TASKS_ACCENT;
+            case "Goals" -> GOALS_ACCENT;
+            case "Projects" -> PROJECTS_ACCENT;
+            case "Habits" -> HABITS_ACCENT;
+            case "Finance" -> FINANCE_ACCENT;
+            case "Focus" -> FOCUS_ACCENT;
+            case "Analytics" -> ANALYTICS_ACCENT;
+            case "Calendar" -> CALENDAR_ACCENT;
+            case "Settings", "Home", "Login", "Register" -> SETTINGS_ACCENT;
+            default -> SETTINGS_ACCENT;
         };
     }
 
@@ -209,18 +224,31 @@ public final class MomentaTheme {
             sidebar.setPadding(new Insets(26, 16, 26, 16));
             sidebar.setSpacing(7);
 
+            Node sidebarBrand = findById(root, "sidebarBrand");
+            if (sidebarBrand instanceof Label label) {
+                label.setTextFill(NEON_LILAC);
+                label.setFont(Font.font(FONT_BOLD, 25));
+                label.setEffect(glow(ROYAL_PURPLE, 8));
+            }
+            Node sidebarSub = findById(root, "sidebarSub");
+            if (sidebarSub instanceof Label label) {
+                label.setTextFill(MUTED);
+                label.setFont(Font.font(FONT_BOLD, 9.5));
+            }
+
             for (Node child : sidebar.getChildren()) {
                 if (child instanceof Button button) {
-                    styleNavButton(button);
+                    styleNavButton(button, moduleAccentFor(button.getText()));
                 }
             }
         }
 
         styleCard(findById(root, "pulseCard"), ELECTRIC_VIOLET);
-        styleCard(findById(root, "taskCard"), COSMIC_BLUE);
-        styleCard(findById(root, "goalCard"), SOFT_GREEN);
-        styleCard(findById(root, "projectCard"), HOT_ORCHID);
+        styleCard(findById(root, "taskCard"), TASKS_ACCENT);
+        styleCard(findById(root, "goalCard"), GOALS_ACCENT);
+        styleCard(findById(root, "projectCard"), PROJECTS_ACCENT);
         styleCard(findById(root, "nowCard"), ROYAL_PURPLE);
+        styleHeroCard(findById(root, "nowCard"), ROYAL_PURPLE);
         styleCard(findById(root, "insightCard"), PERIWINKLE);
         styleCard(findById(root, "gamificationCard"), HOT_ORCHID);
 
@@ -236,6 +264,22 @@ public final class MomentaTheme {
             label.setFont(Font.font(FONT_BOLD, 12));
         }
 
+        Node dashboardScroll = findByType(root, ScrollPane.class);
+        if (dashboardScroll instanceof ScrollPane scroll) {
+            scroll.setBackground(background(NIGHT, 0));
+            scroll.setStyle("-fx-background-color: " + hex(NIGHT) + "; -fx-background: " + hex(NIGHT) + ";");
+            if (scroll.getContent() instanceof VBox content) {
+                content.setBackground(background(NIGHT, 0));
+                content.setSpacing(20);
+            }
+        }
+
+        styleDashboardList(findById(root, "notificationList"));
+        styleHeroMetric(findById(root, "pulseCard"), ELECTRIC_VIOLET);
+        styleHeroMetric(findById(root, "taskCard"), TASKS_ACCENT);
+        styleHeroMetric(findById(root, "goalCard"), GOALS_ACCENT);
+        styleHeroMetric(findById(root, "projectCard"), PROJECTS_ACCENT);
+
         // Strong metric labels.
         for (String id : new String[]{
                 "pulseLabel", "taskCountLabel", "goalCountLabel",
@@ -249,7 +293,7 @@ public final class MomentaTheme {
         }
     }
 
-    private static void styleNavButton(Button button) {
+    private static void styleNavButton(Button button, Color itemAccent) {
         button.setFont(Font.font(FONT_BOLD, 12.5));
         button.setTextFill(TEXT_2);
         button.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
@@ -262,12 +306,19 @@ public final class MomentaTheme {
             button.setTextFill(TEXT);
             button.setTranslateX(3);
             button.setBackground(background(Color.web("#24143A"), 12));
+            button.setBorder(new Border(new BorderStroke(
+                    itemAccent.deriveColor(0, 0.75, 1, 0.75),
+                    BorderStrokeStyle.SOLID, new CornerRadii(12),
+                    new BorderWidths(0, 0, 0, 3))));
+            button.setEffect(glow(itemAccent, 5));
         });
 
         button.setOnMouseExited(e -> {
             button.setTextFill(TEXT_2);
             button.setTranslateX(0);
             button.setBackground(background(Color.TRANSPARENT, 12));
+            button.setBorder(Border.EMPTY);
+            button.setEffect(null);
         });
     }
 
@@ -405,12 +456,126 @@ public final class MomentaTheme {
         String cardId = "Login".equals(viewName) ? "loginCard" : "registerCard";
         Node cardNode = findById(root, cardId);
 
-        if (cardNode instanceof VBox card) {
-            card.setBackground(background(Color.web("#11091DEE"), 26));
-            card.setBorder(border(ROYAL_PURPLE, 1.5));
-            card.setPadding(new Insets(38, 44, 38, 44));
-            card.setEffect(glow(ROYAL_PURPLE, 18));
+        Node scrollNode = findByType(root, ScrollPane.class);
+        if (scrollNode instanceof ScrollPane scroll) {
+            scroll.setBackground(background(Color.TRANSPARENT, 0));
+            scroll.setBorder(Border.EMPTY);
+            scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
         }
+
+        if (cardNode instanceof VBox card) {
+            card.setBackground(new Background(new BackgroundFill(
+                    heroCardGradient(SETTINGS_ACCENT),
+                    new CornerRadii(26), Insets.EMPTY)));
+            card.setBorder(border(SETTINGS_ACCENT.deriveColor(0, 0.85, 1, 0.9), 1.2));
+            card.setPadding(new Insets(40, 46, 40, 46));
+            card.setSpacing(15);
+            card.setEffect(glow(SETTINGS_ACCENT, 16));
+            card.setMaxWidth("Register".equals(viewName) ? 480 : 430);
+
+            Node brand = findById(root, "registerBrand");
+            if (brand == null) brand = findById(root, "loginBrand");
+            if (brand instanceof Label label) {
+                label.setTextFill(NEON_LILAC);
+                label.setFont(Font.font(FONT_BOLD, 34));
+                label.setEffect(glow(ROYAL_PURPLE, 10));
+            }
+            Node kicker = findById(root, "registerKicker");
+            if (kicker instanceof Label label) {
+                label.setTextFill(SETTINGS_ACCENT);
+                label.setFont(Font.font(FONT_BOLD, 11));
+            }
+            Node subtitle = findById(root, "registerSubtitle");
+            if (subtitle == null) subtitle = findById(root, "loginSubtitle");
+            if (subtitle instanceof Label label) {
+                label.setTextFill(TEXT_2);
+                label.setFont(Font.font(FONT, 13));
+            }
+
+            for (Node child : card.getChildren()) {
+                if (child instanceof Label label && label.getText() != null) {
+                    if (label.getText().toLowerCase().contains("momenta") ||
+                        label.getText().toLowerCase().contains("create your")) {
+                        label.setTextFill(NEON_LILAC);
+                        label.setFont(Font.font(FONT_BOLD, 27));
+                    }
+                }
+            }
+
+            // Authentication buttons need an explicit JavaFX inline style so the
+            // platform's default Button skin cannot turn them into light/white
+            // controls. Keep the primary/secondary hierarchy inside the dark theme.
+            int buttonIndex = 0;
+            for (Node child : card.getChildren()) {
+                if (child instanceof Button button) {
+                    boolean primary = buttonIndex++ == 0;
+                    styleAuthButton(button, primary);
+                }
+            }
+        }
+    }
+
+    private static void styleAuthButton(Button button, boolean primary) {
+        Color base = primary ? ROYAL_PURPLE : SURFACE;
+        Color hover = primary ? ELECTRIC_VIOLET : SURFACE_3;
+        Color edge = primary ? ELECTRIC_VIOLET : BORDER;
+
+        button.setFont(Font.font(FONT_BOLD, 13));
+        button.setTextFill(TEXT);
+        button.setPadding(new Insets(11, 20, 11, 20));
+        button.setCursor(javafx.scene.Cursor.HAND);
+        button.setStyle(
+                "-fx-text-fill: " + hex(TEXT) + ";" +
+                "-fx-font-family: 'Segoe UI Semibold';" +
+                "-fx-font-size: 13px;" +
+                "-fx-font-weight: 600;" +
+                "-fx-background-color: " + hex(base) + ";" +
+                "-fx-background-radius: 13;" +
+                "-fx-border-color: " + hex(edge) + ";" +
+                "-fx-border-width: 1.2;" +
+                "-fx-border-radius: 13;" +
+                "-fx-padding: 11 20 11 20;"
+        );
+        button.setEffect(primary ? glow(ROYAL_PURPLE, 7) : null);
+
+        button.setOnMouseEntered(e -> {
+            button.setTranslateY(-1);
+            button.setTextFill(TEXT);
+            button.setStyle(
+                    "-fx-text-fill: " + hex(TEXT) + ";" +
+                    "-fx-font-family: 'Segoe UI Semibold';" +
+                    "-fx-font-size: 13px;" +
+                    "-fx-font-weight: 600;" +
+                    "-fx-background-color: " + hex(hover) + ";" +
+                    "-fx-background-radius: 13;" +
+                    "-fx-border-color: " + hex(primary ? HOT_ORCHID : ROYAL_PURPLE) + ";" +
+                    "-fx-border-width: 1.4;" +
+                    "-fx-border-radius: 13;" +
+                    "-fx-padding: 11 20 11 20;"
+            );
+            button.setEffect(glow(primary ? HOT_ORCHID : ROYAL_PURPLE, 10));
+        });
+
+        button.setOnMouseExited(e -> {
+            button.setTranslateY(0);
+            button.setTextFill(TEXT);
+            button.setStyle(
+                    "-fx-text-fill: " + hex(TEXT) + ";" +
+                    "-fx-font-family: 'Segoe UI Semibold';" +
+                    "-fx-font-size: 13px;" +
+                    "-fx-font-weight: 600;" +
+                    "-fx-background-color: " + hex(base) + ";" +
+                    "-fx-background-radius: 13;" +
+                    "-fx-border-color: " + hex(edge) + ";" +
+                    "-fx-border-width: 1.2;" +
+                    "-fx-border-radius: 13;" +
+                    "-fx-padding: 11 20 11 20;"
+            );
+            button.setEffect(primary ? glow(ROYAL_PURPLE, 7) : null);
+        });
+
+        button.setOnMousePressed(e -> button.setTranslateY(1));
+        button.setOnMouseReleased(e -> button.setTranslateY(0));
     }
 
     // ---------- ALL OTHER WORKSPACES ----------
@@ -423,17 +588,29 @@ public final class MomentaTheme {
         // Make the page header feel like a real application toolbar.
         if (root instanceof BorderPane pane) {
             Node top = pane.getTop();
+            Node center = pane.getCenter();
 
             if (top instanceof Region region) {
-                region.setBackground(background(Color.web("#0D0818F5"), 0));
+                region.setBackground(new Background(new BackgroundFill(
+                        headerGradient(accent), CornerRadii.EMPTY, Insets.EMPTY)));
                 region.setBorder(new Border(new BorderStroke(
-                        BORDER,
+                        accent.deriveColor(0, 1, 1, 0.28),
                         BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY,
                         new BorderWidths(0, 0, 1, 0)
                 )));
+                region.setPadding(new Insets(14, 24, 12, 24));
+            }
+
+            if (center instanceof Region region) {
+                region.setBackground(background(NIGHT, 0));
             }
         }
+
+        // JavaFX's default viewport/table/chart chrome can remain white even
+        // after the parent is themed. Polish those internal skins after CSS
+        // has been created, without introducing an external stylesheet.
+        Platform.runLater(() -> polishWorkspace(root, accent));
 
         // Give common workspace tables a large, premium surface.
         for (String id : new String[]{
@@ -451,8 +628,14 @@ public final class MomentaTheme {
             styleLargeTitles(parent);
         }
 
+        // Premium surface groups and module-specific workspace framing.
+        styleWorkspaceSurfaceGroups(root, accent, viewName);
+
         // View-specific visual emphasis.
         switch (viewName) {
+            case "Tasks" -> styleTaskWorkspace(root, accent);
+            case "Goals" -> styleGoalWorkspace(root, accent);
+            case "Projects" -> styleProjectWorkspace(root, accent);
             case "Focus" -> styleFocus(root, accent);
             case "Analytics" -> styleAnalytics(root, accent);
             case "Finance" -> styleFinance(root, accent);
@@ -460,6 +643,250 @@ public final class MomentaTheme {
             case "Calendar" -> styleCalendar(root, accent);
             case "Settings" -> styleSettings(root, accent);
             default -> {}
+        }
+    }
+
+    private static void polishWorkspace(Node root, Color accent) {
+        if (!(root instanceof Parent parent)) return;
+
+        parent.applyCss();
+
+        for (Node node : parent.lookupAll(".scroll-pane")) {
+            if (node instanceof Control control) {
+                control.setStyle(
+                        "-fx-background-color: " + hex(NIGHT) + ";" +
+                        "-fx-background: " + hex(NIGHT) + ";" +
+                        "-fx-border-color: transparent;"
+                );
+            }
+        }
+
+        for (Node node : parent.lookupAll(".viewport")) {
+            node.setStyle("-fx-background-color: " + hex(NIGHT) + ";");
+        }
+
+        for (Node node : parent.lookupAll(".table-view")) {
+            node.setStyle(
+                    "-fx-background-color: " + hex(SURFACE) + ";" +
+                    "-fx-control-inner-background: " + hex(SURFACE) + ";" +
+                    "-fx-table-cell-border-color: " + hex(BORDER_SOFT) + ";" +
+                    "-fx-selection-bar: " + hex(accent.deriveColor(0, 0.75, 0.82, 1)) + ";" +
+                    "-fx-selection-bar-non-focused: " + hex(accent.deriveColor(0, 0.75, 0.70, 1)) + ";" +
+                    "-fx-font-family: 'Segoe UI';" +
+                    "-fx-font-size: 13px;"
+            );
+        }
+
+        for (Node node : parent.lookupAll(".column-header-background")) {
+            node.setStyle("-fx-background-color: " + hex(SURFACE_2) + ";");
+        }
+
+        for (Node node : parent.lookupAll(".column-header")) {
+            node.setStyle(
+                    "-fx-background-color: " + hex(SURFACE_2) + ";" +
+                    "-fx-border-color: " + hex(BORDER_SOFT) + ";" +
+                    "-fx-border-width: 0 0 1 0;"
+            );
+        }
+
+        for (Node node : parent.lookupAll(".filler")) {
+            node.setStyle("-fx-background-color: " + hex(SURFACE_2) + ";");
+        }
+
+        for (Node node : parent.lookupAll(".table-row-cell")) {
+            node.setStyle(
+                    "-fx-background-color: " + hex(SURFACE) + ";" +
+                    "-fx-border-color: " + hex(BORDER_SOFT) + ";" +
+                    "-fx-border-width: 0 0 1 0;"
+            );
+        }
+
+        for (Node node : parent.lookupAll(".table-cell")) {
+            if (node instanceof Labeled labeled) {
+                labeled.setTextFill(TEXT_2);
+            }
+        }
+
+        for (Node node : parent.lookupAll(".chart-plot-background")) {
+            node.setStyle("-fx-background-color: " + hex(SURFACE) + ";");
+        }
+
+        for (Node node : parent.lookupAll(".chart-vertical-grid-lines")) {
+            node.setStyle("-fx-stroke: " + hex(BORDER_SOFT) + ";");
+        }
+
+        for (Node node : parent.lookupAll(".chart-horizontal-grid-lines")) {
+            node.setStyle("-fx-stroke: " + hex(BORDER_SOFT) + ";");
+        }
+
+        for (Node node : parent.lookupAll(".chart-legend")) {
+            node.setStyle("-fx-background-color: " + hex(SURFACE_2) + ";");
+        }
+
+        for (Node node : parent.lookupAll(".chart-pie-label")) {
+            if (node instanceof Label label) label.setTextFill(TEXT_2);
+        }
+
+        for (Node node : parent.lookupAll(".spinner")) {
+            node.setStyle(
+                    "-fx-background-color: " + hex(SURFACE) + ";" +
+                    "-fx-border-color: " + hex(BORDER) + ";" +
+                    "-fx-border-radius: 10;" +
+                    "-fx-background-radius: 10;"
+            );
+        }
+    }
+
+    private static void styleWorkspaceSurfaceGroups(Node root, Color accent, String viewName) {
+        if (!(root instanceof BorderPane pane)) return;
+
+        Node center = pane.getCenter();
+        if (center instanceof ScrollPane scroll && scroll.getContent() instanceof Parent content) {
+            styleSurfaceGroups(content, accent);
+        } else if (center instanceof Parent parent) {
+            styleSurfaceGroups(parent, accent);
+        }
+
+        styleNamedSurface(findById(root, "workspaceHeader"), accent, 14, false);
+        styleNamedSurface(findById(root, "workspaceBody"), accent, 16, false);
+        styleNamedSurface(findById(root, "habitDetailsCard"), SOFT_GREEN, 16, true);
+        styleNamedSurface(findById(root, "financeIncomeCard"), SOFT_GREEN, 16, true);
+        styleNamedSurface(findById(root, "financeExpenseCard"), PEACH, 16, true);
+        styleNamedSurface(findById(root, "financeBalanceCard"), SKY_BLUE, 16, true);
+        styleNamedSurface(findById(root, "financeSavingsCard"), NEON_LILAC, 16, true);
+        styleNamedSurface(findById(root, "analyticsPulseCard"), ELECTRIC_VIOLET, 16, true);
+        styleNamedSurface(findById(root, "analyticsProductivityCard"), SKY_BLUE, 16, true);
+        styleNamedSurface(findById(root, "analyticsHabitCard"), SOFT_GREEN, 16, true);
+        styleNamedSurface(findById(root, "settingsAppearanceCard"), accent, 16, true);
+        styleNamedSurface(findById(root, "settingsStartupCard"), accent, 16, true);
+
+        // Settings is intentionally more structured: each preference block
+        // becomes a calm elevated panel instead of a flat white/default area.
+        if ("Settings".equals(viewName)) {
+            for (Node node : allNodes(root)) {
+                if (node instanceof Label label && label.getText() != null &&
+                        ("Appearance".equals(label.getText()) || "Startup".equals(label.getText()))) {
+                    Node parent = label.getParent();
+                    if (parent instanceof VBox section) {
+                        section.setBackground(background(SURFACE, 16));
+                        section.setBorder(border(BORDER, 1));
+                        section.setPadding(new Insets(18));
+                        section.setEffect(softShadow(accent));
+                    }
+                }
+            }
+        }
+
+        // Focus gets a dedicated timer/control stage.
+        if ("Focus".equals(viewName)) {
+            for (Node node : allNodes(root)) {
+                if (node instanceof Label label && "FOCUS".equals(label.getText())) {
+                    Node parent = label.getParent();
+                    if (parent instanceof VBox stage) {
+                        stage.setBackground(new Background(new BackgroundFill(
+                                heroCardGradient(accent), new CornerRadii(22), Insets.EMPTY)));
+                        stage.setBorder(border(accent, 1.2));
+                        stage.setPadding(new Insets(24));
+                        stage.setEffect(glow(accent, 14));
+                    }
+                }
+            }
+        }
+
+        // Workspace entry animation keeps every module consistent with the
+        // existing dashboard motion language.
+
+// পরে (ঠিক):
+        Platform.runLater(() -> {
+            if (center != null) {
+                AnimationUtil.fadeIn(center, 220);
+            }
+        });
+    }
+
+    private static void styleSurfaceGroups(Node node, Color accent) {
+        if (!(node instanceof Parent parent)) return;
+
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof Region region) {
+                boolean containsTable = hasDirectType(region, TableView.class);
+                boolean containsChart = hasDirectType(region, Chart.class);
+
+                if (containsTable || containsChart) {
+                    region.setBackground(background(SURFACE, 16));
+                    region.setBorder(border(BORDER, 1));
+                    region.setPadding(new Insets(14));
+                    region.setEffect(softShadow(accent));
+                }
+            }
+            styleSurfaceGroups(child, accent);
+        }
+    }
+
+    private static boolean hasDirectType(Parent parent, Class<?> type) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (type.isInstance(child)) return true;
+        }
+        return false;
+    }
+
+    private static List<Node> allNodes(Node root) {
+        List<Node> nodes = new java.util.ArrayList<>();
+        collectNodes(root, nodes);
+        return nodes;
+    }
+
+    private static void collectNodes(Node node, List<Node> nodes) {
+        nodes.add(node);
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                collectNodes(child, nodes);
+            }
+        }
+    }
+
+    private static void styleNamedSurface(Node node, Color accent, double radius, boolean padded) {
+        if (!(node instanceof Region region)) return;
+        region.setBackground(new Background(new BackgroundFill(
+                cardGradient(accent), new CornerRadii(radius), Insets.EMPTY)));
+        region.setBorder(border(accent.deriveColor(0, 0.78, 1, 0.55), 1));
+        if (padded) region.setPadding(new Insets(14));
+        region.setEffect(softShadow(accent));
+    }
+
+    private static void styleTaskWorkspace(Node root, Color accent) {
+        styleWorkspaceToolbar(root, TASKS_ACCENT, "TASKS", "Turn your next actions into momentum.");
+    }
+
+    private static void styleGoalWorkspace(Node root, Color accent) {
+        styleWorkspaceToolbar(root, GOALS_ACCENT, "GOALS", "Keep the big picture visible and measurable.");
+    }
+
+    private static void styleProjectWorkspace(Node root, Color accent) {
+        styleWorkspaceToolbar(root, PROJECTS_ACCENT, "PROJECTS", "Turn goals into progress you can see.");
+    }
+
+    private static void styleWorkspaceToolbar(Node root, Color accent, String kicker, String subtitle) {
+        if (!(root instanceof BorderPane pane)) return;
+        Node top = pane.getTop();
+        if (!(top instanceof Parent parent)) return;
+
+        boolean first = true;
+        for (Node node : parent.getChildrenUnmodifiable()) {
+            if (node instanceof Label label) {
+                if (first) {
+                    label.setTextFill(accent);
+                    label.setFont(Font.font(FONT_BOLD, 29));
+                    first = false;
+                }
+            }
+        }
+
+        for (Node node : parent.lookupAll(".label")) {
+            if (node instanceof Label label && label.getText() != null &&
+                    label.getText().contains("Progress here")) {
+                label.setTextFill(MUTED);
+            }
         }
     }
 
@@ -480,6 +907,7 @@ public final class MomentaTheme {
     }
 
     private static void styleFocus(Node root, Color accent) {
+        accent = FOCUS_ACCENT;
         Node timer = findById(root, "timerLabel");
         if (timer instanceof Label label) {
             label.setFont(Font.font(FONT_BOLD, 58));
@@ -518,7 +946,7 @@ public final class MomentaTheme {
     }
 
     private static void styleFinance(Node root, Color accent) {
-        Color[] colors = {SOFT_GREEN, PEACH, NEON_LILAC, SKY_BLUE};
+        Color[] colors = {SOFT_GREEN, FINANCE_ACCENT, NEON_LILAC, SKY_BLUE};
 
         String[] ids = {"incomeLabel", "expenseLabel", "balanceLabel", "savingsLabel"};
 
@@ -649,21 +1077,22 @@ public final class MomentaTheme {
     private static void styleCard(Node node, Color accent) {
         if (!(node instanceof Region card)) return;
 
-        card.setBackground(background(SURFACE, 18));
-        card.setBorder(border(accent, 1.4));
-        card.setPadding(new Insets(17));
-        card.setEffect(glow(accent, 7));
+        card.setBackground(new Background(new BackgroundFill(
+                cardGradient(accent), new CornerRadii(18), Insets.EMPTY)));
+        card.setBorder(border(accent.deriveColor(0, 0.78, 1, 0.72), 1.15));
+        card.setPadding(new Insets(18));
+        card.setEffect(softShadow(accent));
 
         card.setOnMouseEntered(e -> {
             card.setTranslateY(-3);
             card.setBackground(background(SURFACE_2, 18));
-            card.setEffect(glow(accent, 14));
+            card.setEffect(glow(accent, 12));
         });
 
         card.setOnMouseExited(e -> {
             card.setTranslateY(0);
             card.setBackground(background(SURFACE, 18));
-            card.setEffect(glow(accent, 7));
+            card.setEffect(softShadow(accent));
         });
     }
 
@@ -705,8 +1134,29 @@ public final class MomentaTheme {
                 "-fx-text-fill: " + hex(TEXT) + ";" +
                         "-fx-prompt-text-fill: " + hex(MUTED) + ";" +
                         "-fx-highlight-fill: " + hex(accent) + ";" +
-                        "-fx-highlight-text-fill: white;"
+                        "-fx-highlight-text-fill: white;" +
+                        "-fx-control-inner-background: " + hex(SURFACE) + ";" +
+                        "-fx-background-color: " + hex(SURFACE) + ";" +
+                        "-fx-background-insets: 0;" +
+                        "-fx-background-radius: 11;" +
+                        "-fx-border-color: " + hex(BORDER) + ";" +
+                        "-fx-border-radius: 11;" +
+                        "-fx-border-width: 1;"
         );
+
+        if (input instanceof TextArea area) {
+            area.setWrapText(true);
+            area.setPrefRowCount(Math.max(area.getPrefRowCount(), 4));
+            Platform.runLater(() -> {
+                area.applyCss();
+                for (Node n : area.lookupAll(".content")) {
+                    n.setStyle("-fx-background-color: " + hex(SURFACE) + ";");
+                }
+                for (Node n : area.lookupAll(".scroll-pane")) {
+                    n.setStyle("-fx-background-color: " + hex(SURFACE) + ";");
+                }
+            });
+        }
 
         input.focusedProperty().addListener((obs, oldVal, focused) -> {
             input.setBorder(border(focused ? accent : BORDER, focused ? 1.5 : 1));
@@ -738,8 +1188,40 @@ public final class MomentaTheme {
                         "-fx-control-inner-background: " + hex(SURFACE) + ";" +
                         "-fx-table-cell-border-color: " + hex(BORDER_SOFT) + ";" +
                         "-fx-selection-bar: " + hex(DEEP_PLUM) + ";" +
-                        "-fx-selection-bar-non-focused: " + hex(DEEP_PLUM) + ";"
+                        "-fx-selection-bar-non-focused: " + hex(DEEP_PLUM) + ";" +
+                        "-fx-text-background-color: " + hex(TEXT) + ";"
         );
+
+        // JavaFX TableView headers/cells are skin-created nodes, so styling the
+        // TableView alone is not enough to prevent the default dark text.
+        Platform.runLater(() -> {
+            table.applyCss();
+            for (Node headerBg : table.lookupAll(".column-header-background")) {
+                headerBg.setStyle(
+                        "-fx-background-color: " + hex(SURFACE_2) + ";" +
+                        "-fx-border-color: " + hex(accent.deriveColor(0, 0.55, 1, 0.45)) + ";" +
+                        "-fx-border-width: 0 0 1 0;"
+                );
+            }
+            for (Node header : table.lookupAll(".column-header")) {
+                header.setStyle(
+                        "-fx-background-color: " + hex(SURFACE_2) + ";" +
+                        "-fx-border-color: transparent;"
+                );
+            }
+            for (Node labelNode : table.lookupAll(".column-header .label")) {
+                if (labelNode instanceof Label label) {
+                    label.setTextFill(TEXT);
+                    label.setFont(Font.font(FONT_BOLD, 12.5));
+                }
+            }
+            for (Node cell : table.lookupAll(".table-cell")) {
+                cell.setStyle(
+                        "-fx-text-fill: " + hex(TEXT_2) + ";" +
+                        "-fx-background-color: transparent;"
+                );
+            }
+        });
     }
 
     private static Label makePlaceholder() {
@@ -757,6 +1239,50 @@ public final class MomentaTheme {
                 "-fx-background-color: " + hex(SURFACE) + ";" +
                         "-fx-control-inner-background: " + hex(SURFACE) + ";" +
                         "-fx-selection-bar: " + hex(DEEP_PLUM) + ";"
+        );
+    }
+
+    private static void styleHeroCard(Node node, Color accent) {
+        if (!(node instanceof Region card)) return;
+        card.setBackground(new Background(new BackgroundFill(
+                heroCardGradient(accent), new CornerRadii(20), Insets.EMPTY)));
+        card.setBorder(border(accent.deriveColor(0, 0.85, 1.05, 0.9), 1.4));
+        card.setEffect(glow(accent, 13));
+    }
+
+    private static DropShadow softShadow(Color accent) {
+        DropShadow shadow = new DropShadow();
+        shadow.setColor(Color.color(
+                accent.getRed(), accent.getGreen(), accent.getBlue(), 0.16));
+        shadow.setRadius(16);
+        shadow.setOffsetY(5);
+        return shadow;
+    }
+
+    private static LinearGradient cardGradient(Color accent) {
+        return new LinearGradient(
+                0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#171027")),
+                new Stop(0.58, SURFACE),
+                new Stop(1, Color.color(accent.getRed(), accent.getGreen(), accent.getBlue(), 0.075))
+        );
+    }
+
+    private static LinearGradient heroCardGradient(Color accent) {
+        return new LinearGradient(
+                0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#21113A")),
+                new Stop(0.48, Color.web("#171026")),
+                new Stop(1, Color.color(accent.getRed(), accent.getGreen(), accent.getBlue(), 0.20))
+        );
+    }
+
+    private static LinearGradient headerGradient(Color accent) {
+        return new LinearGradient(
+                0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#0D0818")),
+                new Stop(0.68, Color.web("#120B1F")),
+                new Stop(1, Color.color(accent.getRed(), accent.getGreen(), accent.getBlue(), 0.10))
         );
     }
 
@@ -778,6 +1304,7 @@ public final class MomentaTheme {
             case "Electric Violet" -> ELECTRIC_VIOLET;
             case "Plum" -> DEEP_PLUM;
             case "Sky Blue" -> SKY_BLUE;
+            case "Sea Green" -> SEA_GREEN;
             case "Lavender" -> NEON_LILAC;
             case "Soft Green" -> SOFT_GREEN;
             case "Peach" -> PEACH;
@@ -847,6 +1374,80 @@ public final class MomentaTheme {
                 new Stop(0.68, Color.web("#24103A")),
                 new Stop(1, Color.web("#09050F"))
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void styleDashboardList(Node node) {
+        if (!(node instanceof ListView<?> rawList)) return;
+        ListView<String> list = (ListView<String>) rawList;
+        list.setBackground(background(SURFACE, 16));
+        list.setBorder(border(BORDER_SOFT, 1));
+        list.setPrefHeight(105);
+        list.setMinHeight(90);
+        list.setMaxHeight(125);
+        list.setStyle(
+                "-fx-background-color: " + hex(SURFACE) + ";" +
+                "-fx-control-inner-background: " + hex(SURFACE) + ";" +
+                "-fx-selection-bar: " + hex(DEEP_PLUM) + ";" +
+                "-fx-selection-bar-non-focused: " + hex(SURFACE_3) + ";" +
+                "-fx-focus-color: transparent;" +
+                "-fx-faint-focus-color: transparent;"
+        );
+
+        // Notification rows use ListCell skins; explicitly style their text
+        // so JavaFX's default blue/black text cannot override the dark theme.
+        list.setCellFactory(view -> new ListCell<String>() {
+            {
+                setFont(Font.font(FONT, 13));
+                setTextFill(TEXT_2);
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.toString());
+                setTextFill(empty ? MUTED : TEXT_2);
+                setBackground(empty
+                        ? Background.EMPTY
+                        : background(SURFACE, 0));
+                setPadding(new Insets(10, 12, 10, 12));
+            }
+        });
+    }
+
+    private static void styleHeroMetric(Node node, Color accent) {
+        if (!(node instanceof Region card)) return;
+        card.setMinHeight(92);
+        card.setPadding(new Insets(16));
+        card.setEffect(softShadow(accent));
+    }
+
+    private static Color moduleAccentFor(String label) {
+        if (label == null) return SETTINGS_ACCENT;
+        String name = label.replaceAll("[^A-Za-z]", "").toLowerCase();
+        return switch (name) {
+            case "tasks" -> TASKS_ACCENT;
+            case "goals" -> GOALS_ACCENT;
+            case "projects" -> PROJECTS_ACCENT;
+            case "calendar" -> CALENDAR_ACCENT;
+            case "habits" -> HABITS_ACCENT;
+            case "finance" -> FINANCE_ACCENT;
+            case "focus" -> FOCUS_ACCENT;
+            case "analytics" -> ANALYTICS_ACCENT;
+            case "settings" -> SETTINGS_ACCENT;
+            default -> ROYAL_PURPLE;
+        };
+    }
+
+    private static Node findByType(Node root, Class<?> type) {
+        if (type.isInstance(root)) return root;
+        if (root instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                Node found = findByType(child, type);
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
 
     private static Node findById(Node root, String id) {
