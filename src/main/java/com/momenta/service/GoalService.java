@@ -42,6 +42,10 @@ public class GoalService {
         return goalDAO.findAll(userId);
     }
 
+    public Goal getGoal(int id) {
+        return goalDAO.findById(id);
+    }
+
     /** Top-level ("Life") goals — parentGoalId is null. */
     public List<Goal> getTopLevelGoals(int userId) {
         return goalDAO.findTopLevel(userId);
@@ -69,7 +73,17 @@ public class GoalService {
                 .toList();
 
         if (linkedTasks.isEmpty()) {
-            return; // no linked tasks yet — leave progress as whatever it was (likely 0)
+            // No linked tasks (either none were ever attached, or the last
+            // one was just deleted/reassigned). Reset to 0 rather than
+            // leaving a stale percentage from before the tasks were
+            // removed — the DB default for a new goal is already 0, so
+            // this only changes behavior for the "tasks were removed"
+            // case, where it's correct.
+            if (goal.getProgress() != 0) {
+                goal.setProgress(0);
+                goalDAO.update(goal);
+            }
+            return;
         }
 
         long completed = linkedTasks.stream().filter(Task::isCompleted).count();

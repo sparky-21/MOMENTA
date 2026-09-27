@@ -25,6 +25,8 @@
                 <Label text="Settings &amp; Personalization">
                     <font><Font name="System Bold" size="27"/></font>
                 </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="⏻  Logout" onAction="#onLogout"/>
             </HBox>
             <Label fx:id="accountLabel" text="Personal settings"/>
             <Separator/>

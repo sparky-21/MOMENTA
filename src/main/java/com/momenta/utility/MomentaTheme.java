@@ -508,6 +508,32 @@ public final class MomentaTheme {
             scroll.setBackground(background(Color.TRANSPARENT, 0));
             scroll.setBorder(Border.EMPTY);
             scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+            // The ScrollPane control's own background/style, set above, does
+            // NOT reach the ".viewport" (and internal ".scroll-pane") nodes
+            // its Skin creates — those carry their own default (light)
+            // background from the platform stylesheet as separate painted
+            // layers stacked in front of whatever the ScrollPane itself is
+            // set to. polishWorkspace() already patches this exact thing for
+            // every workspace screen (Tasks, Dashboard, ...); Login/Register
+            // are the only other views built on a ScrollPane and need the
+            // same patch, or their card can appear to be floating over a
+            // plain white panel that never gets themed.
+            Platform.runLater(() -> {
+                scroll.applyCss();
+                for (Node node : scroll.lookupAll(".viewport")) {
+                    node.setStyle("-fx-background-color: transparent;");
+                }
+                for (Node node : scroll.lookupAll(".scroll-pane")) {
+                    if (node instanceof Control control) {
+                        control.setStyle(
+                                "-fx-background-color: transparent;" +
+                                "-fx-background: transparent;" +
+                                "-fx-border-color: transparent;"
+                        );
+                    }
+                }
+            });
         }
 
         if (cardNode instanceof VBox card) {

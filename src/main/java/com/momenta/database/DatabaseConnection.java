@@ -49,8 +49,23 @@ public final class DatabaseConnection {
                 // SQLite ignores FOREIGN KEY constraints unless this pragma
                 // is set on every connection — easy to forget, so we do it
                 // once, centrally, here.
+                //
+                // busy_timeout matters here specifically because MOMENTA's
+                // background pool (TaskExecutor) runs up to 4 worker threads
+                // plus a scheduler thread, and every DAO call above shares
+                // this ONE Connection object (Section 18 — SQLite tolerates
+                // only one writer at a time). Without a busy_timeout, two
+                // threads hitting the database at the same instant raise
+                // "SQLITE_BUSY: database is locked" immediately. Setting it
+                // tells SQLite to retry internally for up to 5s before
+                // giving up, which covers virtually every real overlap this
+                // app produces (a save that takes a few milliseconds vs.
+                // another thread's query). It does not make concurrent
+                // writes safe in general — it only smooths over brief
+                // contention on this single shared connection.
                 try (Statement pragma = connection.createStatement()) {
                     pragma.execute("PRAGMA foreign_keys = ON;");
+                    pragma.execute("PRAGMA busy_timeout = 5000;");
                 }
             }
         } catch (SQLException e) {

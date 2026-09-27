@@ -32,4 +32,9 @@ public class UserService {
         }
         return user;
     }
+
+    /** Used by the "Remember me" auto-login on startup (SessionStore). */
+    public User getById(int id) {
+        return userDAO.findById(id);
+    }
 }

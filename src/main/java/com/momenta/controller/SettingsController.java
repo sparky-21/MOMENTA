@@ -4,6 +4,7 @@ import com.momenta.service.SettingsService;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.SessionStore;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -76,5 +77,16 @@ public class SettingsController {
     private void onBack() {
         SceneManager.getInstance().invalidate("Dashboard");
         SceneManager.getInstance().switchTo("Dashboard");
+    }
+
+    @FXML
+    private void onLogout() {
+        if (!AlertUtil.confirm("Logout", "Are you sure you want to log out of MOMENTA?")) {
+            return;
+        }
+        CurrentUser.logout();
+        SessionStore.forget();
+        SceneManager.getInstance().invalidateAll();
+        SceneManager.getInstance().switchTo("Login");
     }
 }

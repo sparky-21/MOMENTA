@@ -45,8 +45,25 @@ public final class SceneManager {
         try {
             Parent root = viewCache.computeIfAbsent(viewName, this::load);
 
+            // Stay fully invisible until every step below (attach, bind,
+            // theme, layout) has actually run. AnimationUtil.fadeIn() also
+            // starts its FadeTransition at opacity 0, but a Transition only
+            // takes effect on its first animation pulse — it does not
+            // guarantee opacity is 0 the instant play() is called. Setting
+            // it here ourselves, synchronously, closes that gap: whatever
+            // JavaFX renders between scene.setRoot(root) below and the
+            // fadeIn() call at the end, it will render nothing for this
+            // node — see the Scene's own fill (set in the branch below) for
+            // why that no longer means "white".
+            root.setOpacity(0);
+
             if (scene == null) {
                 scene = new Scene(root, 1200, 750);
+                // JavaFX Scenes are white-filled by default. If anything
+                // ever renders while root is transparent or not yet themed
+                // (see setOpacity(0) above), this is what shows through —
+                // MOMENTA's own background, not a flash of plain white.
+                scene.setFill(MomentaTheme.NIGHT);
                 stage.setScene(scene);
             } else {
                 scene.setRoot(root);
@@ -59,12 +76,16 @@ public final class SceneManager {
 
             // Phase 19: apply the complete MOMENTA palette without CSS.
             MomentaTheme.apply(root, viewName);
-
-            // Phase 20: centralized page-entry animation.
-            AnimationUtil.fadeIn(root, 220);
+            root.applyCss();
+            root.layout();
 
             // Phase 21: install Ctrl+K once on the application's Scene.
             CommandPalette.install(scene);
+
+            // Phase 20: centralized page-entry animation. Everything above
+            // has already happened, so this fade reveals the finished,
+            // fully-themed view — never a part-way state.
+            AnimationUtil.fadeIn(root, 220);
 
         } catch (RuntimeException e) {
             AlertUtil.showError("Navigation error", "Could not open " + viewName + ".", e);
@@ -94,13 +115,60 @@ public final class SceneManager {
         region.maxHeightProperty().bind(scene.heightProperty());
     }
 
+    /**
+     * Loads an FXML view, themes it, and forces it through a full CSS +
+     * layout pass immediately — instead of leaving any of that for
+     * switchTo() to do after the view is already attached to the Scene.
+     *
+     * This used to call only applyCss()+layout() here and leave
+     * MomentaTheme.apply() for switchTo() to call afterward. That left a
+     * window where a Parent could sit in viewCache still wearing JavaFX's
+     * default look — white text fields, plain gray buttons — because
+     * nothing had painted MOMENTA's colors onto it yet. Whether that
+     * default look was actually visible depended on incidental
+     * scene-attachment/pulse timing, which is exactly why it showed up as
+     * a flash on the very first visit to a view and never again
+     * afterwards (once themed, the same cached Parent instance stays
+     * themed).
+     *
+     * Doing MomentaTheme.apply() right here instead means every Parent
+     * that ever enters viewCache — whether loaded eagerly by preload() or
+     * lazily by switchTo() — is already fully themed before its first
+     * CSS/layout pass and before it is ever attached to a Scene. There is
+     * no unstyled state left for a cached view to be caught in.
+     */
     private Parent load(String viewName) {
         try {
             String path = "/com/momenta/view/" + viewName + ".fxml";
             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
-            return loader.load();
+            Parent root = loader.load();
+            MomentaTheme.apply(root, viewName);
+            root.applyCss();
+            root.layout();
+            return root;
         } catch (IOException e) {
             throw new RuntimeException("Failed to load view: " + viewName, e);
         }
+    }
+
+    /**
+     * Loads a view into the cache without displaying it, so the first real
+     * switchTo(viewName) call for it is instant and already warmed up
+     * (FXML parsed, CSS/layout done) rather than paying that cost on the
+     * user's first click. Must run on the JavaFX Application Thread, same
+     * as any FXML/Node work, so this always goes through Platform.runLater
+     * even when called from the FX thread itself.
+     *
+     * Only views whose controllers do not require CurrentUser to already be
+     * logged in should be preloaded this way (e.g. Login, Register) —
+     * Dashboard and the other workspace screens read CurrentUser.getId()
+     * during initialize() and would throw if warmed before login.
+     */
+    public void preload(String... viewNames) {
+        javafx.application.Platform.runLater(() -> {
+            for (String viewName : viewNames) {
+                viewCache.computeIfAbsent(viewName, this::load);
+            }
+        });
     }
 }

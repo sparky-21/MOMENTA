@@ -2,8 +2,10 @@ package com.momenta.controller;
 
 import com.momenta.model.User;
 import com.momenta.service.UserService;
+import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.SessionStore;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -45,20 +47,46 @@ public class RegisterController {
         String profession = professionBox.getValue();
         if ("Other".equals(profession)) profession = otherProfessionField.getText();
 
-        try {
-            User user = userService.register(
-                    nameField.getText(), usernameField.getText(),
-                    passwordField.getText(), profession
-            );
-            CurrentUser.login(user);
+        // Rule #14: registration (unique-username check + insert +
+        // password hashing) used to run straight on the FX Application
+        // Thread. Moved onto TaskExecutor's pool for the same reason as
+        // LoginController.onLogin().
+        final String name = nameField.getText();
+        final String username = usernameField.getText();
+        final String password = passwordField.getText();
+        final String finalProfession = profession;
+
+        messageLabel.setText("");
+
+        javafx.concurrent.Task<User> registerTask = new javafx.concurrent.Task<>() {
+            @Override
+            protected User call() {
+                return userService.register(name, username, password, finalProfession);
+            }
+        };
+
+        registerTask.setOnSucceeded(e -> {
+            User newUser = registerTask.getValue();
+            CurrentUser.login(newUser);
+            // A brand-new account signs itself in immediately, so remember
+            // it too — otherwise the person would hit the login screen on
+            // their very next launch right after just registering.
+            SessionStore.remember(newUser.getId());
             SceneManager.getInstance().invalidate("Dashboard");
             SceneManager.getInstance().switchTo("Dashboard");
-        } catch (IllegalArgumentException e) {
-            messageLabel.setText(e.getMessage());
-        } catch (RuntimeException e) {
-            messageLabel.setText("Unable to create account.");
-            e.printStackTrace();
-        }
+        });
+
+        registerTask.setOnFailed(e -> {
+            Throwable ex = registerTask.getException();
+            if (ex instanceof IllegalArgumentException) {
+                messageLabel.setText(ex.getMessage());
+            } else {
+                messageLabel.setText("Unable to create account.");
+                if (ex != null) ex.printStackTrace();
+            }
+        });
+
+        TaskExecutor.getInstance().workPool().submit(registerTask);
     }
 
     @FXML

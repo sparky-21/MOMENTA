@@ -46,6 +46,26 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public User findById(int id) {
+        String sql = "SELECT id,name,username,password_hash,persona FROM users WHERE id=?";
+        try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("name"));
+                u.setUsername(rs.getString("username"));
+                u.setPasswordHash(rs.getString("password_hash"));
+                u.setPersona(rs.getString("persona"));
+                return u;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to find user", e);
+        }
+    }
+
+    @Override
     public boolean usernameExists(String username) {
         String sql = "SELECT 1 FROM users WHERE username=? LIMIT 1";
         try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement(sql)) {

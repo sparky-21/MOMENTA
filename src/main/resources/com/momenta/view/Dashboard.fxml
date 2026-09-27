@@ -40,6 +40,7 @@
                 <Button text="⌁  Analytics" maxWidth="Infinity" onAction="#onOpenAnalytics"/>
                 <Separator/>
                 <Button text="⚙  Settings" maxWidth="Infinity" onAction="#onOpenSettings"/>
+                <Button text="⏻  Logout" maxWidth="Infinity" onAction="#onLogout"/>
             </children>
             <padding><Insets top="20" right="14" bottom="20" left="14"/></padding>
         </VBox>

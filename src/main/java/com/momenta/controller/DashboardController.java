@@ -18,6 +18,7 @@ import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
+import com.momenta.utility.SessionStore;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -107,12 +108,13 @@ public class DashboardController {
             @Override
             protected DashboardData call() {
                 List<com.momenta.model.Task> incomplete = taskService.getIncompleteTasks(uid);
-                com.momenta.model.Task recommended = taskService.getMomentaNowRecommendation(uid);
+                com.momenta.engine.MomentaCore.Recommendation recommendation =
+                        taskService.getMomentaNowRecommendation(uid);
                 long activeGoals = goalService.getAllGoals(uid).stream()
                         .filter(g -> "ACTIVE".equals(g.getStatus())).count();
                 long activeProjects = projectService.getAllProjects(uid).stream()
                         .filter(p -> "ACTIVE".equals(p.getStatus())).count();
-                return new DashboardData(incomplete.size(), recommended, (int) activeGoals, (int) activeProjects);
+                return new DashboardData(incomplete.size(), recommendation, (int) activeGoals, (int) activeProjects);
             }
         };
         loadTask.setOnSucceeded(e -> applyDashboardData(loadTask.getValue()));
@@ -125,8 +127,8 @@ public class DashboardController {
         goalCountLabel.setText(String.valueOf(data.activeGoals()));
         projectCountLabel.setText(String.valueOf(data.activeProjects()));
 
-        com.momenta.model.Task rec = data.recommendation();
-        if (rec == null) {
+        com.momenta.engine.MomentaCore.Recommendation recommendation = data.recommendation();
+        if (recommendation == null) {
             nowTitleLabel.setText("Nothing pending — add a task to get started.");
             nowPriorityLabel.setText("");
             nowDeadlineLabel.setText("");
@@ -137,15 +139,16 @@ public class DashboardController {
             return;
         }
 
+        com.momenta.model.Task rec = recommendation.task();
         nowTitleLabel.setText(rec.getTitle());
-        nowPriorityLabel.setText("Priority: " + rec.getPriorityScore() + " / 100");
+        nowPriorityLabel.setText("Priority: " + recommendation.score() + " / 100");
         nowDeadlineLabel.setText(rec.getDeadline() == null || rec.getDeadline().isBlank()
                 ? "No deadline set" : "Deadline: " + rec.getDeadline());
-        List<String> reasons = com.momenta.engine.PriorityEngine.score(rec).getReasons();
+        List<String> reasons = recommendation.reasons();
         nowReasonsLabel.setText("• " + String.join("\n• ", reasons.isEmpty() ? List.of("Standard priority") : reasons));
         AnimationUtil.animateProgress(nowProgressBar, rec.getProgress() / 100.0);
         nowProgressPercentLabel.setText(rec.getProgress() + "%");
-        pulseLabel.setText(String.valueOf(rec.getPriorityScore()));
+        pulseLabel.setText(String.valueOf(recommendation.score()));
         AnimationUtil.fadeIn(nowTitleLabel, 180);
     }
 
@@ -236,6 +239,23 @@ public class DashboardController {
     @FXML private void onOpenFocus() { SceneManager.getInstance().invalidate("Focus"); SceneManager.getInstance().switchTo("Focus"); }
     @FXML private void onOpenAnalytics() { SceneManager.getInstance().invalidate("Analytics"); SceneManager.getInstance().switchTo("Analytics"); }
     @FXML private void onOpenSettings() { SceneManager.getInstance().invalidate("Settings"); SceneManager.getInstance().switchTo("Settings"); }
+
+    @FXML
+    private void onLogout() {
+        if (!AlertUtil.confirm("Logout", "Are you sure you want to log out of MOMENTA?")) {
+            return;
+        }
+        // Clear the in-memory session AND the "Remember me" record (otherwise
+        // the app would just auto-login the same user again on next launch),
+        // then drop every cached view — Dashboard, Tasks, etc. were rendered
+        // with this user's data and must not be reused for whoever logs in
+        // next — before returning to the Login screen.
+        CurrentUser.logout();
+        SessionStore.forget();
+        SceneManager.getInstance().invalidateAll();
+        SceneManager.getInstance().switchTo("Login");
+    }
+
     @FXML private void onRefresh() {
         greetingLabel.setText(greetingForNow());
         loadDashboardData();
@@ -251,11 +271,24 @@ public class DashboardController {
 
     @FXML
     private void onOpenNotifications() {
-        List<Notification> unread = notificationService.getUnread(CurrentUser.getId());
-        String message = unread.isEmpty()
-                ? "You have no unread notifications."
-                : unread.stream().map(Notification::getMessage).collect(Collectors.joining("\n\n"));
-        AlertUtil.showInfo("Notifications", message);
+        // Was a direct notificationService.getUnread() call on the FX
+        // thread — a DB read triggered by a simple button click, breaking
+        // Rule #14 like the other spots fixed in this pass.
+        final int uid = CurrentUser.getId();
+        Task<List<Notification>> task = new Task<>() {
+            @Override protected List<Notification> call() {
+                return notificationService.getUnread(uid);
+            }
+        };
+        task.setOnSucceeded(e -> {
+            List<Notification> unread = task.getValue();
+            String message = unread.isEmpty()
+                    ? "You have no unread notifications."
+                    : unread.stream().map(Notification::getMessage).collect(Collectors.joining("\n\n"));
+            AlertUtil.showInfo("Notifications", message);
+        });
+        task.setOnFailed(e -> AlertUtil.showError("Notifications", "Could not load notifications.", task.getException()));
+        TaskExecutor.getInstance().workPool().submit(task);
     }
 
     @FXML
@@ -279,6 +312,6 @@ public class DashboardController {
         return "Good evening";
     }
 
-    private record DashboardData(int incompleteCount, com.momenta.model.Task recommendation, int activeGoals, int activeProjects) {}
+    private record DashboardData(int incompleteCount, com.momenta.engine.MomentaCore.Recommendation recommendation, int activeGoals, int activeProjects) {}
     private record NotificationData(int unreadCount, List<String> messages) {}
 }

@@ -597,26 +597,74 @@ public class CalendarController {
             }
 
 
-            Label taskLabel =
-                    new Label(
-                            "• "
+            boolean completed =
+                    "COMPLETED".equalsIgnoreCase(task.getStatus());
+
+
+            // Rule: once a task is completed (i.e. submitted), the calendar
+            // should offer a way to remove its deadline entry instead of it
+            // sitting there forever. A plain Label had no click handler at
+            // all, so completed tasks could never be cleared from here —
+            // only from the Tasks screen. Turning this into a Button lets a
+            // finished task be deleted right from the calendar cell.
+            Button taskButton =
+                    new Button(
+                            (completed ? "✓ " : "• ")
                                     +
                                     task.getTitle());
 
 
-            taskLabel.setMaxWidth(
+            taskButton.setMaxWidth(
                     Double.MAX_VALUE);
 
 
-            taskLabel.setWrapText(false);
+            taskButton.setAlignment(
+                    Pos.CENTER_LEFT);
 
 
-            taskLabel.setFont(Font.font("System", 11));
-            taskLabel.setTextFill(com.momenta.utility.MomentaTheme.TEXT_2);
+            taskButton.setPadding(
+                    new Insets(2, 5, 2, 5));
+
+
+            taskButton.setFont(Font.font("System", 11));
+            taskButton.setTextFill(completed
+                    ? com.momenta.utility.MomentaTheme.MUTED
+                    : com.momenta.utility.MomentaTheme.TEXT_2);
+            taskButton.setBackground(new Background(new BackgroundFill(
+                    Color.TRANSPARENT, new CornerRadii(6), Insets.EMPTY)));
+            taskButton.setBorder(Border.EMPTY);
+            taskButton.setCursor(javafx.scene.Cursor.HAND);
+
+
+            taskButton.setOnAction(e -> {
+
+                selectedDate = date;
+
+                updateSelectedDateLabel();
+
+                if (completed) {
+
+                    if (AlertUtil.confirm(
+                            "Delete task",
+                            "\"" + task.getTitle()
+                                    + "\" is already completed. Remove it from the calendar?")) {
+
+                        deleteTaskFromCalendar(task);
+                    }
+
+                } else {
+
+                    AlertUtil.showInfo(
+                            "Task not finished yet",
+                            "Only completed tasks can be removed from the calendar. "
+                                    + "Finish or delete \"" + task.getTitle()
+                                    + "\" from the Tasks screen.");
+                }
+            });
 
 
             cell.getChildren().add(
-                    taskLabel);
+                    taskButton);
 
 
             shown++;
@@ -824,6 +872,81 @@ public class CalendarController {
 
 
     // =========================================================
+    // DELETE EVENT
+    // =========================================================
+
+    private void deleteEvent(
+            Event event) {
+
+
+        javafx.concurrent.Task<Void> task =
+                new javafx.concurrent.Task<>() {
+
+                    @Override
+                    protected Void call() {
+
+                        eventService.deleteEvent(
+                                event.getId());
+
+                        return null;
+                    }
+                };
+
+
+        task.setOnSucceeded(
+                e -> loadMonthData());
+
+
+        task.setOnFailed(
+                e -> AlertUtil.showError(
+                        "Delete Failed",
+                        "Could not delete event.",
+                        task.getException()));
+
+
+        TaskExecutor.getInstance()
+                .workPool()
+                .submit(task);
+    }
+
+
+    // =========================================================
+    // DELETE TASK (from calendar, completed tasks only)
+    // =========================================================
+
+    private void deleteTaskFromCalendar(Task task) {
+
+        javafx.concurrent.Task<Void> task2 =
+                new javafx.concurrent.Task<>() {
+
+                    @Override
+                    protected Void call() {
+
+                        taskService.deleteTask(task.getId());
+
+                        return null;
+                    }
+                };
+
+
+        task2.setOnSucceeded(
+                e -> loadMonthData());
+
+
+        task2.setOnFailed(
+                e -> AlertUtil.showError(
+                        "Delete Failed",
+                        "Could not delete task.",
+                        task2.getException()));
+
+
+        TaskExecutor.getInstance()
+                .workPool()
+                .submit(task2);
+    }
+
+
+    // =========================================================
     // EVENT DIALOG
     // =========================================================
 
@@ -851,6 +974,21 @@ public class CalendarController {
                 .addAll(
                         ButtonType.OK,
                         ButtonType.CANCEL);
+
+
+        // EventDAO/EventService already implement delete() (Section 20), but
+        // no screen ever called it, so an event could be created and edited
+        // from the calendar but never removed — an incomplete CRUD chain for
+        // this module. Only offer it once there is an existing event to
+        // delete.
+        ButtonType deleteButtonType =
+                new ButtonType("Delete", ButtonBar.ButtonData.LEFT);
+
+        if (edit) {
+            dialog.getDialogPane()
+                    .getButtonTypes()
+                    .add(deleteButtonType);
+        }
 
 
         TextField titleField =
@@ -986,6 +1124,37 @@ public class CalendarController {
                 .setContent(form);
 
         com.momenta.utility.MomentaTheme.styleDialog(dialog.getDialogPane());
+
+
+        // -----------------------------------------------------
+        // DELETE (edit mode only)
+        // -----------------------------------------------------
+
+        if (edit) {
+
+            Button deleteButton =
+                    (Button) dialog.getDialogPane()
+                            .lookupButton(deleteButtonType);
+
+            // A plain ActionEvent filter, consumed, lets us skip the
+            // dialog's normal "close and run the result converter" flow so
+            // Delete can never be misread as OK by showEventDialog's caller.
+            deleteButton.addEventFilter(
+                    javafx.event.ActionEvent.ACTION,
+                    evt -> {
+
+                        evt.consume();
+
+                        if (AlertUtil.confirm(
+                                "Delete event",
+                                "Delete \"" + existing.getTitle()
+                                        + "\"? This cannot be undone.")) {
+
+                            deleteEvent(existing);
+                            dialog.close();
+                        }
+                    });
+        }
 
 
         // -----------------------------------------------------
