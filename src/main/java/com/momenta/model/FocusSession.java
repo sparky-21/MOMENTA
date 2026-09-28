@@ -11,8 +11,20 @@ public class FocusSession {
     private String startedAt;
     private String endedAt;
 
+    // Default no-arg constructor
     public FocusSession() {}
 
+    // 6-parameters constructor (DAO database read er jonno id shoho)
+    public FocusSession(int id, int userId, Integer taskId, int durationMinutes, String startedAt, String endedAt) {
+        this.id = id;
+        this.userId = userId;
+        this.taskId = taskId;
+        this.durationMinutes = durationMinutes;
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
+    }
+
+    // 5-parameters constructor (New session create er jonno - id auto generate hobe)
     public FocusSession(int userId, Integer taskId, int durationMinutes,
                         String startedAt, String endedAt) {
         this.userId = userId;
@@ -38,5 +50,10 @@ public class FocusSession {
     public static FocusSession start(int userId, Integer taskId, int durationMinutes) {
         return new FocusSession(userId, taskId, durationMinutes,
                 LocalDateTime.now().toString(), null);
+    }
+
+    public static FocusSession finish(int userId, Integer taskId, int durationMinutes, String startedAt) {
+        return new FocusSession(userId, taskId, durationMinutes,
+                startedAt, LocalDateTime.now().toString());
     }
 }

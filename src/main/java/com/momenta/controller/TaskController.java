@@ -15,7 +15,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +61,66 @@ public class TaskController extends AbstractScreenController {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         taskTable.setItems(tasks);
+        configureModernTaskRows();
         refresh();
+    }
+
+    private void configureModernTaskRows() {
+        taskTable.setRowFactory(table -> new TableRow<>() {
+            @Override
+            protected void updateItem(Task item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setBackground(Background.EMPTY);
+                    setBorder(Border.EMPTY);
+                    return;
+                }
+                Color accent = "COMPLETED".equals(item.getStatus())
+                        ? com.momenta.utility.MomentaTheme.SOFT_GREEN
+                        : com.momenta.utility.MomentaTheme.TASKS_ACCENT;
+                setBackground(new Background(new BackgroundFill(
+                        com.momenta.utility.MomentaTheme.SURFACE, new CornerRadii(10), Insets.EMPTY)));
+                setBorder(new Border(new BorderStroke(
+                        accent.deriveColor(0, 0.6, 1, 0.35),
+                        BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1))));
+                setPrefHeight(52);
+            }
+        });
+
+        progressColumn.setCellFactory(col -> new TableCell<>() {
+            private final ProgressBar bar = new ProgressBar();
+            private final Label label = new Label();
+            private final HBox box = new HBox(7, bar, label);
+            {
+                bar.setPrefWidth(58);
+                bar.setPrefHeight(7);
+                box.setAlignment(Pos.CENTER_LEFT);
+            }
+            @Override protected void updateItem(Number value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null) { setGraphic(null); return; }
+                int p = value.intValue();
+                bar.setProgress(p / 100.0);
+                label.setText(p + "%");
+                setGraphic(box);
+            }
+        });
+
+        statusColumn.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) { setText(null); return; }
+                setText("COMPLETED".equals(status) ? "✓ Completed" : "◐ " + status);
+            }
+        });
+
+        priorityColumn.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Number value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null) { setText(null); return; }
+                setText("P" + value.intValue());
+            }
+        });
     }
 
     /** {@inheritDoc} For Tasks, "refresh" means reloading tasks + the goal/project pickers. */

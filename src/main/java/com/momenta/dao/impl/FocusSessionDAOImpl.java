@@ -10,6 +10,7 @@ import java.util.List;
 
 /** JDBC persistence for Focus Mode. */
 public class FocusSessionDAOImpl implements FocusSessionDAO {
+
     @Override
     public FocusSession save(FocusSession session) {
         String sql = "INSERT INTO focus_sessions " +
@@ -17,14 +18,20 @@ public class FocusSessionDAOImpl implements FocusSessionDAO {
         try (PreparedStatement ps = DatabaseConnection.getConnection()
                 .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, session.getUserId());
-            if (session.getTaskId() == null) ps.setNull(2, Types.INTEGER);
-            else ps.setInt(2, session.getTaskId());
+            if (session.getTaskId() == null) {
+                ps.setNull(2, Types.INTEGER);
+            } else {
+                ps.setInt(2, session.getTaskId());
+            }
             ps.setInt(3, session.getDurationMinutes());
             ps.setString(4, session.getStartedAt());
             ps.setString(5, session.getEndedAt());
             ps.executeUpdate();
+
             try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) session.setId(keys.getInt(1));
+                if (keys.next()) {
+                    session.setId(keys.getInt(1));
+                }
             }
             return session;
         } catch (SQLException e) {

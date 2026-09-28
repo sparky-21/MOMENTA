@@ -1,55 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.momenta.controller.GoalController">
-
-    <top>
-        <VBox id="workspaceHeader" spacing="10" fillWidth="true">
-            <padding><Insets top="18" right="24" bottom="14" left="24"/></padding>
-            <HBox spacing="12" alignment="CENTER_LEFT">
-                <Button text="← Dashboard" onAction="#onBackToDashboard"/>
-                <VBox spacing="2">
-                    <Label id="moduleKicker" text="GOALS • LONG-TERM DIRECTION"/>
-                    <Label id="pageTitle" text="Goals">
-                        <font><Font name="System Bold" size="24"/></font>
-                    </Label>
-                </VBox>
-            </HBox>
-            <Label id="pageSubtitle" text="Life Goal → Year Goal → Monthly Goal → Project — keep the bigger picture measurable."
-                   wrapText="true" maxWidth="Infinity"/>
-            <FlowPane id="actionBar" hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity">
-                <Button text="Add Goal" onAction="#onAddGoal"/>
-                <Button text="Edit" onAction="#onEditGoal"/>
-                <Button text="Delete" onAction="#onDeleteGoal"/>
-            </FlowPane>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.momenta.controller.GoalController">
+    <top><VBox id="workspaceHeader" spacing="12" fillWidth="true"><padding><Insets top="20" right="28" bottom="16" left="28"/></padding>
+        <HBox spacing="12" alignment="CENTER_LEFT"><Button text="← Dashboard" onAction="#onBackToDashboard"/><VBox spacing="2" HBox.hgrow="ALWAYS"><Label id="moduleKicker" text="GOALS • LONG-TERM DIRECTION"/><Label id="pageTitle" text="Goals"><font><Font name="System Bold" size="28"/></font></Label></VBox><Button text="＋ Add Goal" onAction="#onAddGoal"/></HBox>
+        <Label id="pageSubtitle" text="Turn long-term direction into measurable progress, then let linked projects and tasks move it forward." wrapText="true" maxWidth="Infinity"/>
+        <FlowPane id="actionBar" hgap="8" vgap="8" prefWrapLength="720" maxWidth="Infinity"><Button text="Edit" onAction="#onEditGoal"/><Button text="Delete" onAction="#onDeleteGoal"/></FlowPane>
+    </VBox></top>
+    <center><VBox id="workspaceBody" fillWidth="true" spacing="12"><padding><Insets top="8" right="28" bottom="24" left="28"/></padding>
+        <VBox id="goalTableSurface" spacing="10" VBox.vgrow="ALWAYS"><HBox spacing="10" alignment="CENTER_LEFT"><Label text="GOAL ROADMAP"><font><Font name="System Bold" size="16"/></font></Label><Region HBox.hgrow="ALWAYS"/><Label text="Progress • Importance • Status"/></HBox>
+            <TableView id="workspaceTable" fx:id="goalTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity"><columns>
+                <TableColumn fx:id="titleColumn" text="Goal" prefWidth="250"/><TableColumn fx:id="parentColumn" text="Parent Goal" prefWidth="170"/><TableColumn fx:id="deadlineColumn" text="Deadline" prefWidth="120"/><TableColumn fx:id="progressColumn" text="Progress" prefWidth="145"/><TableColumn fx:id="importanceColumn" text="Importance" prefWidth="100"/><TableColumn fx:id="statusColumn" text="Status" prefWidth="125"/>
+            </columns></TableView>
         </VBox>
-    </top>
-
-    <center>
-        <VBox id="workspaceBody" fillWidth="true" spacing="10">
-            <padding><Insets top="14" right="24" bottom="20" left="24"/></padding>
-            <TableView id="workspaceTable" fx:id="goalTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
-                <columns>
-                    <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
-                    <TableColumn fx:id="parentColumn" text="Parent Goal" prefWidth="160"/>
-                    <TableColumn fx:id="deadlineColumn" text="Deadline" prefWidth="110"/>
-                    <TableColumn fx:id="progressColumn" text="Progress %" prefWidth="100"/>
-                    <TableColumn fx:id="importanceColumn" text="Importance" prefWidth="90"/>
-                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="110"/>
-                </columns>
-            </TableView>
-        </VBox>
-    </center>
+    </VBox></center>
 </BorderPane>

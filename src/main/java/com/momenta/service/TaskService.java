@@ -90,6 +90,21 @@ public class TaskService {
         return taskDAO.findByDate(userId, isoDate);
     }
 
+    /**
+     * Dashboard daily view: include tasks due on the selected date and also
+     * tasks created on that date when they do not have a deadline. This keeps
+     * newly-created undated tasks visible in the daily command center instead
+     * of making them appear to have vanished.
+     */
+    public List<Task> getTasksForDashboardDate(int userId, String isoDate) {
+        return taskDAO.findAll(userId).stream()
+                .filter(task -> isoDate.equals(task.getDeadline())
+                        || ((task.getDeadline() == null || task.getDeadline().isBlank())
+                        && task.getCreatedAt() != null
+                        && task.getCreatedAt().startsWith(isoDate)))
+                .toList();
+    }
+
     /** Recomputes and stores the deterministic priority score (Section 15). */
     public void recalculatePriority(Task task) {
         PriorityEngine.PriorityResult result = PriorityEngine.score(task);

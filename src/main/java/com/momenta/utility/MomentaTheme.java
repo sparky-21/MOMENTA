@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.chart.Chart;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
@@ -95,6 +96,13 @@ public final class MomentaTheme {
         } else {
             styleWorkspace(root, accent, viewName);
         }
+
+        // JavaFX can rebuild a Button skin during the first CSS/layout pulse.
+        // Do one final pass after the view-specific styling so platform-gray
+        // buttons can never leak back into the dark MOMENTA interface.
+        if (!"Home".equals(viewName) && !"Login".equals(viewName) && !"Register".equals(viewName)) {
+            polishAllButtons(root, accent, viewName);
+        }
     }
 
     public static Color accentColor() {
@@ -148,6 +156,14 @@ public final class MomentaTheme {
 
         if (node instanceof Button button) {
             styleButton(button, accent);
+            // JavaFX may recreate the button skin after the first CSS pass.
+            // Re-apply the MOMENTA skin once the control is attached/layout is ready.
+            Platform.runLater(() -> {
+                if (button.getScene() != null) {
+                    button.applyCss();
+                    setButtonSkin(button, SURFACE, TEXT, accent, 1);
+                }
+            });
         } else if (node instanceof TextInputControl input) {
             styleInput(input, accent);
         } else if (node instanceof ComboBox<?> combo) {
@@ -168,8 +184,10 @@ public final class MomentaTheme {
             progressBar.setPrefHeight(10);
             progressBar.setStyle(
                     "-fx-accent: " + hex(accent) + ";" +
-                            "-fx-control-inner-background: " + hex(SURFACE_3) + ";"
+                            "-fx-control-inner-background: " + hex(SURFACE_3) + ";" +
+                            "-fx-background-color: transparent;"
             );
+            polishProgressBar(progressBar, accent);
         }
 
         if (node instanceof TableView<?> table) {
@@ -239,18 +257,23 @@ public final class MomentaTheme {
 
             for (Node child : sidebar.getChildren()) {
                 if (child instanceof Button button) {
-                    styleNavButton(button, moduleAccentFor(button.getText()));
+                    boolean active = "navOverview".equals(button.getId());
+                    styleNavButton(button, moduleAccentFor(button.getText()), active);
                 }
             }
         }
 
-        styleCard(findById(root, "pulseCard"), ELECTRIC_VIOLET);
         styleCard(findById(root, "taskCard"), TASKS_ACCENT);
         styleCard(findById(root, "goalCard"), GOALS_ACCENT);
         styleCard(findById(root, "projectCard"), PROJECTS_ACCENT);
+        styleCard(findById(root, "focusCard"), FOCUS_ACCENT);
+        styleCard(findById(root, "todayProgressCard"), ROYAL_PURPLE);
         styleCard(findById(root, "nowCard"), ROYAL_PURPLE);
         styleHeroCard(findById(root, "nowCard"), ROYAL_PURPLE);
+        styleCard(findById(root, "todayTasksCard"), TASKS_ACCENT);
+        styleCard(findById(root, "upcomingCard"), CALENDAR_ACCENT);
         styleCard(findById(root, "insightCard"), PERIWINKLE);
+        styleCard(findById(root, "notificationsCard"), BORDER_SOFT);
         styleCard(findById(root, "gamificationCard"), HOT_ORCHID);
 
         Node greeting = findById(root, "greetingLabel");
@@ -278,12 +301,15 @@ public final class MomentaTheme {
         styleDashboardList(findById(root, "notificationList"));
         styleDashboardSurface(findById(root, "notificationsCard"), BORDER_SOFT);
         styleDashboardHero(findById(root, "dashboardHero"));
+        styleDashboardSurface(findById(root, "todayProgressCard"), ROYAL_PURPLE);
+        styleDashboardSurface(findById(root, "todayTasksCard"), TASKS_ACCENT);
+        styleDashboardSurface(findById(root, "upcomingCard"), CALENDAR_ACCENT);
         styleDashboardSurface(findById(root, "gamificationCard"), HOT_ORCHID);
         styleDashboardSurface(findById(root, "insightCard"), PERIWINKLE);
-        styleHeroMetric(findById(root, "pulseCard"), ELECTRIC_VIOLET);
         styleHeroMetric(findById(root, "taskCard"), TASKS_ACCENT);
         styleHeroMetric(findById(root, "goalCard"), GOALS_ACCENT);
         styleHeroMetric(findById(root, "projectCard"), PROJECTS_ACCENT);
+        styleHeroMetric(findById(root, "focusCard"), FOCUS_ACCENT);
 
         // Strong metric labels.
         Node status = findById(root, "dashboardStatus");
@@ -312,6 +338,51 @@ public final class MomentaTheme {
             label.setFont(Font.font(FONT_BOLD, 10));
         }
 
+        Node selectedDate = findById(root, "selectedDateLabel");
+        if (selectedDate instanceof Label label) {
+            label.setTextFill(TEXT_2);
+            label.setFont(Font.font(FONT_BOLD, 13));
+        }
+
+        Node dateTitle = findById(root, "dateProgressTitleLabel");
+        if (dateTitle instanceof Label label) {
+            label.setTextFill(NEON_LILAC);
+            label.setFont(Font.font(FONT_BOLD, 13));
+        }
+
+        Node dateProgress = findById(root, "todayProgressPercentLabel");
+        if (dateProgress instanceof Label label) {
+            label.setTextFill(TEXT);
+            label.setFont(Font.font(FONT_BOLD, 30));
+        }
+
+        Node dateMeta = findById(root, "todayProgressMetaLabel");
+        if (dateMeta instanceof Label label) {
+            label.setTextFill(MUTED);
+            label.setFont(Font.font(FONT, 10.5));
+        }
+
+        Node dateHint = findById(root, "todayProgressHintLabel");
+        if (dateHint instanceof Label label) {
+            label.setTextFill(TEXT_2);
+            label.setFont(Font.font(FONT, 11));
+            label.setWrapText(true);
+        }
+
+        Node nowBadge = findById(root, "nowPriorityBadge");
+        if (nowBadge instanceof Label label) {
+            label.setTextFill(TEXT);
+            label.setFont(Font.font(FONT_BOLD, 10));
+            label.setBackground(background(DEEP_PLUM, 9));
+            label.setPadding(new Insets(5, 9, 5, 9));
+        }
+
+        Node focusIcon = findById(root, "focusIcon");
+        if (focusIcon instanceof Label label) {
+            label.setTextFill(FOCUS_ACCENT);
+            label.setFont(Font.font(FONT_BOLD, 16));
+        }
+
         for (String id : new String[]{
                 "pulseLabel", "taskCountLabel", "goalCountLabel",
                 "projectCountLabel", "levelLabel", "xpLabel"
@@ -321,6 +392,32 @@ public final class MomentaTheme {
                 label.setTextFill(NEON_LILAC);
                 label.setFont(Font.font(FONT_BOLD, 25));
             }
+        }
+
+        styleMetricDetail(root, "pulseIcon", ELECTRIC_VIOLET);
+        styleMetricDetail(root, "taskIcon", TASKS_ACCENT);
+        styleMetricDetail(root, "goalIcon", GOALS_ACCENT);
+        styleMetricDetail(root, "projectIcon", PROJECTS_ACCENT);
+        styleMetricMeta(root, "pulseMeta");
+        styleMetricMeta(root, "taskMeta");
+        styleMetricMeta(root, "goalMeta");
+        styleMetricMeta(root, "projectMeta");
+    }
+
+    private static void styleMetricDetail(Node root, String id, Color accent) {
+        Node node = findById(root, id);
+        if (node instanceof Label label) {
+            label.setTextFill(accent);
+            label.setFont(Font.font(FONT_BOLD, 16));
+            label.setEffect(glow(accent, 5));
+        }
+    }
+
+    private static void styleMetricMeta(Node root, String id) {
+        Node node = findById(root, id);
+        if (node instanceof Label label) {
+            label.setTextFill(MUTED);
+            label.setFont(Font.font(FONT, 10.5));
         }
     }
 
@@ -340,33 +437,66 @@ public final class MomentaTheme {
         region.setEffect(softShadow(accent));
     }
 
-    private static void styleNavButton(Button button, Color itemAccent) {
+    private static void styleNavButton(Button button, Color itemAccent, boolean active) {
         button.setFont(Font.font(FONT_BOLD, 12.5));
-        button.setTextFill(TEXT_2);
         button.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setPadding(new Insets(11, 14, 11, 14));
-        button.setBackground(background(Color.TRANSPARENT, 12));
-        button.setBorder(Border.EMPTY);
+        button.setCursor(javafx.scene.Cursor.HAND);
+
+        applyNavButtonState(button, itemAccent, active, false);
 
         button.setOnMouseEntered(e -> {
             button.setTextFill(TEXT);
             button.setTranslateX(3);
             button.setBackground(background(Color.web("#24143A"), 12));
             button.setBorder(new Border(new BorderStroke(
-                    itemAccent.deriveColor(0, 0.75, 1, 0.75),
+                    itemAccent.deriveColor(0, 0.75, 1, 0.78),
                     BorderStrokeStyle.SOLID, new CornerRadii(12),
                     new BorderWidths(0, 0, 0, 3))));
-            button.setEffect(glow(itemAccent, 5));
+            button.setStyle(
+                    "-fx-background-color: " + hex(Color.web("#24143A")) + ";" +
+                    "-fx-background-radius: 12;" +
+                    "-fx-border-color: " + hex(itemAccent) + ";" +
+                    "-fx-border-width: 0 0 0 3;" +
+                    "-fx-border-radius: 12;" +
+                    "-fx-text-fill: " + hex(TEXT) + ";" +
+                    "-fx-font-family: '" + FONT + "';" +
+                    "-fx-font-size: 12.5px;" +
+                    "-fx-font-weight: bold;"
+            );
+            button.setEffect(glow(itemAccent, 6));
         });
 
         button.setOnMouseExited(e -> {
-            button.setTextFill(TEXT_2);
             button.setTranslateX(0);
-            button.setBackground(background(Color.TRANSPARENT, 12));
-            button.setBorder(Border.EMPTY);
-            button.setEffect(null);
+            applyNavButtonState(button, itemAccent, active, false);
         });
+    }
+
+    private static void applyNavButtonState(Button button, Color itemAccent, boolean active, boolean pressed) {
+        button.setTextFill(active ? TEXT : TEXT_2);
+        button.setBackground(background(active ? itemAccent.deriveColor(0, 0.72, 0.38, 0.18) : Color.TRANSPARENT, 12));
+        button.setBorder(active
+                ? new Border(new BorderStroke(
+                        itemAccent.deriveColor(0, 0.68, 1, 0.82),
+                        BorderStrokeStyle.SOLID,
+                        new CornerRadii(12),
+                        new BorderWidths(0, 0, 0, 3)))
+                : Border.EMPTY);
+        button.setStyle(
+                "-fx-background-color: " + hex(active ? itemAccent.deriveColor(0, 0.72, 0.38, 0.18) : Color.TRANSPARENT) + ";" +
+                "-fx-background-radius: 12;" +
+                "-fx-border-color: " + hex(active ? itemAccent.deriveColor(0, 0.68, 1, 0.82) : Color.TRANSPARENT) + ";" +
+                "-fx-border-width: " + (active ? "0 0 0 3" : "0") + ";" +
+                "-fx-border-radius: 12;" +
+                "-fx-text-fill: " + hex(active ? TEXT : TEXT_2) + ";" +
+                "-fx-font-family: '" + FONT + "';" +
+                "-fx-font-size: 12.5px;" +
+                "-fx-font-weight: bold;"
+        );
+        button.setEffect(active ? glow(itemAccent, 5) : null);
+        if (pressed) button.setTranslateY(1);
     }
 
     // ---------- HOME ----------
@@ -772,6 +902,28 @@ public final class MomentaTheme {
                     "-fx-border-color: " + hex(BORDER_SOFT) + ";" +
                     "-fx-border-width: 0 0 1 0;"
             );
+
+            if (node instanceof TableRow<?> row) {
+                row.setOnMouseEntered(e -> {
+                    if (!row.isEmpty() && !row.isSelected()) {
+                        row.setStyle(
+                                "-fx-background-color: " + hex(SURFACE_3) + ";" +
+                                "-fx-border-color: " + hex(BORDER_SOFT) + ";" +
+                                "-fx-border-width: 0 0 1 3;" +
+                                "-fx-border-insets: 0 0 0 0;"
+                        );
+                    }
+                });
+                row.setOnMouseExited(e -> {
+                    if (!row.isEmpty() && !row.isSelected()) {
+                        row.setStyle(
+                                "-fx-background-color: " + hex(SURFACE) + ";" +
+                                "-fx-border-color: " + hex(BORDER_SOFT) + ";" +
+                                "-fx-border-width: 0 0 1 0;"
+                        );
+                    }
+                });
+            }
         }
 
         for (Node node : parent.lookupAll(".table-cell")) {
@@ -831,7 +983,37 @@ public final class MomentaTheme {
             node.setStyle("-fx-background-color: " + hex(SURFACE_2) + "; -fx-background-radius: 10; -fx-padding: 7;");
         }
         for (Node node : parent.lookupAll(".chart-legend-item")) {
-            if (node instanceof Labeled labeled) labeled.setTextFill(TEXT_2);
+            if (node instanceof Labeled labeled) {
+                labeled.setTextFill(TEXT_2);
+                labeled.setFont(Font.font(FONT, 11.5));
+            }
+        }
+        for (Node node : parent.lookupAll(".chart-legend-symbol")) {
+            node.setStyle("-fx-background-radius: 5; -fx-padding: 4;");
+        }
+
+        for (Node node : parent.lookupAll(".chart")) {
+            if (node instanceof javafx.scene.chart.XYChart<?, ?> xyChart) {
+                Platform.runLater(() -> polishChartData(xyChart, accent));
+                xyChart.getData().addListener((javafx.collections.ListChangeListener<javafx.scene.chart.XYChart.Series<?, ?>>) change ->
+                        Platform.runLater(() -> polishChartData(xyChart, accent)));
+            } else if (node instanceof PieChart pieChart) {
+                Platform.runLater(() -> {
+                    pieChart.applyCss();
+                    pieChart.layout();
+                    polishChartData(pieChart, accent);
+                    polishPieChart(pieChart, accent);
+                });
+                pieChart.getData().addListener((javafx.collections.ListChangeListener<PieChart.Data>) change ->
+                        Platform.runLater(() -> {
+                            pieChart.applyCss();
+                            pieChart.layout();
+                            polishChartData(pieChart, accent);
+                            polishPieChart(pieChart, accent);
+                        }));
+            } else if (node instanceof Chart chart) {
+                Platform.runLater(() -> polishChartData(chart, accent));
+            }
         }
         // PieChart labels are rendered as Text nodes, not JavaFX Label controls.
         // Therefore setting Label.textFill alone does not affect the visible
@@ -851,6 +1033,84 @@ public final class MomentaTheme {
         }
         for (Node node : parent.lookupAll(".chart-content")) {
             node.setEffect(softShadow(accent));
+        }
+    }
+
+    private static void polishPieChart(PieChart pie, Color accent) {
+        Color[] palette = {
+                FINANCE_ACCENT, ELECTRIC_VIOLET, SKY_BLUE,
+                SOFT_GREEN, PINK, PERIWINKLE
+        };
+
+        // Labels are Text nodes generated by the PieChart skin.
+        for (Node labelNode : pie.lookupAll(".chart-pie-label")) {
+            if (labelNode instanceof Text text) {
+                text.setFill(TEXT_2);
+                text.setStroke(null);
+                text.setFont(Font.font(FONT_BOLD, 11.5));
+            }
+        }
+
+        for (Node lineNode : pie.lookupAll(".chart-pie-label-line")) {
+            lineNode.setStyle(
+                    "-fx-stroke: " + hex(TEXT_2) + ";" +
+                    "-fx-stroke-width: 1.1;"
+            );
+        }
+
+        // Legend symbols now use the exact same palette order as the pie slices.
+        // Previously JavaFX's default cyan/green legend colors could remain.
+        int i = 0;
+        for (Node symbol : pie.lookupAll(".chart-legend-item-symbol")) {
+            Color c = palette[i % palette.length];
+            symbol.setStyle(
+                    "-fx-background-color: " + hex(c) + ";" +
+                    "-fx-background-radius: 999;" +
+                    "-fx-min-width: 10; -fx-min-height: 10;" +
+                    "-fx-pref-width: 10; -fx-pref-height: 10;" +
+                    "-fx-max-width: 10; -fx-max-height: 10;"
+            );
+            i++;
+        }
+
+        for (Node item : pie.lookupAll(".chart-legend-item")) {
+            if (item instanceof Labeled labeled) {
+                labeled.setTextFill(TEXT_2);
+                labeled.setFont(Font.font(FONT, 11.5));
+            }
+        }
+    }
+
+    private static void polishChartData(Chart chart, Color accent) {
+        if (chart instanceof javafx.scene.chart.XYChart<?, ?> xyChart) {
+            for (Node seriesLine : xyChart.lookupAll(".chart-series-line")) {
+                seriesLine.setStyle("-fx-stroke: " + hex(accent) + "; -fx-stroke-width: 2.4px;");
+            }
+            for (Node symbol : xyChart.lookupAll(".chart-line-symbol")) {
+                symbol.setStyle("-fx-background-color: " + hex(accent) + ", white; -fx-background-radius: 5;");
+            }
+            for (Node bar : xyChart.lookupAll(".chart-bar")) {
+                bar.setStyle("-fx-bar-fill: " + hex(accent) + ";");
+            }
+        }
+
+        if (chart instanceof PieChart pie) {
+            Color[] piePalette = {
+                    FINANCE_ACCENT, ELECTRIC_VIOLET, SKY_BLUE,
+                    SOFT_GREEN, PINK, PERIWINKLE
+            };
+
+            // Use PieChart.Data order rather than lookupAll() node order so
+            // every legend symbol is guaranteed to match its actual slice.
+            for (int i = 0; i < pie.getData().size(); i++) {
+                PieChart.Data data = pie.getData().get(i);
+                Color color = piePalette[i % piePalette.length];
+                Node slice = data.getNode();
+                if (slice != null) {
+                    slice.setStyle("-fx-pie-color: " + hex(color) + ";");
+                }
+            }
+            polishPieChart(pie, accent);
         }
     }
 
@@ -876,6 +1136,9 @@ public final class MomentaTheme {
         styleNamedSurface(findById(root, "analyticsHabitCard"), SOFT_GREEN, 16, true);
         styleNamedSurface(findById(root, "settingsAppearanceCard"), accent, 16, true);
         styleNamedSurface(findById(root, "settingsStartupCard"), accent, 16, true);
+        styleNamedSurface(findById(root, "settingsAboutCard"), PERIWINKLE, 16, true);
+        styleNamedSurface(findById(root, "focusControls"), FOCUS_ACCENT, 16, true);
+        styleNamedSurface(findById(root, "focusHistorySurface"), FOCUS_ACCENT, 16, true);
 
         // Settings is intentionally more structured: each preference block
         // becomes a calm elevated panel instead of a flat white/default area.
@@ -1042,16 +1305,72 @@ public final class MomentaTheme {
 
     private static void styleFocus(Node root, Color accent) {
         accent = FOCUS_ACCENT;
+
+        Node timerCard = findById(root, "focusTimerCard");
+        if (timerCard instanceof Region card) {
+            card.setMinHeight(250);
+            card.setPadding(new Insets(28, 34, 26, 34));
+            card.setBackground(new Background(new BackgroundFill(
+                    heroCardGradient(accent), new CornerRadii(24), Insets.EMPTY)));
+            card.setBorder(border(accent.deriveColor(0, 0.72, 1, 0.62), 1.15));
+            card.setEffect(glow(accent, 14));
+        }
+
+        Node kicker = findById(root, "focusKicker");
+        if (kicker instanceof Label label) {
+            label.setTextFill(accent);
+            label.setFont(Font.font(FONT_BOLD, 10.5));
+            label.setEffect(glow(accent, 5));
+        }
+
+        Node caption = findById(root, "focusModeCaption");
+        if (caption instanceof Label label) {
+            label.setTextFill(MUTED);
+            label.setFont(Font.font(FONT_BOLD, 11));
+        }
+
+        Node timerArc = findById(root, "timerArc");
+        if (timerArc instanceof javafx.scene.shape.Arc arc) {
+            arc.setFill(Color.TRANSPARENT);
+            arc.setStroke(accent);
+            arc.setStrokeWidth(14);
+            arc.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+            arc.setEffect(glow(accent, 12));
+        }
+
+        Node timerTrack = findByType(root, javafx.scene.shape.Circle.class);
+        if (timerTrack instanceof javafx.scene.shape.Circle circle) {
+            circle.setFill(Color.TRANSPARENT);
+            circle.setStroke(SURFACE_3);
+            circle.setStrokeWidth(14);
+        }
+
         Node timer = findById(root, "timerLabel");
         if (timer instanceof Label label) {
-            label.setFont(Font.font(FONT_BOLD, 58));
-            label.setTextFill(NEON_LILAC);
-            label.setEffect(glow(accent, 22));
+            label.setFont(Font.font(FONT_BOLD, 68));
+            label.setTextFill(TEXT);
+            label.setEffect(glow(accent, 24));
+        }
+
+        Node hint = findById(root, "focusTimerHint");
+        if (hint instanceof Label label) {
+            label.setTextFill(TEXT_2);
+            label.setFont(Font.font(FONT, 11.5));
+            label.setWrapText(true);
+            label.setAlignment(javafx.geometry.Pos.CENTER);
+            label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
         }
 
         Node status = findById(root, "statusLabel");
         if (status instanceof Label label) {
-            label.setTextFill(TEXT_2);
+            label.setTextFill(SOFT_GREEN);
+            label.setFont(Font.font(FONT_BOLD, 12));
+            label.setEffect(glow(SOFT_GREEN, 5));
+        }
+
+        Node actionBar = findById(root, "focusActionBar");
+        if (actionBar instanceof Region bar) {
+            bar.setPadding(new Insets(4, 0, 4, 0));
         }
     }
 
@@ -1075,8 +1394,84 @@ public final class MomentaTheme {
             if (n instanceof ProgressBar bar) {
                 bar.setPrefHeight(11);
                 bar.setStyle("-fx-accent: " + hex(accent) + ";");
+                polishProgressBar(bar, accent);
             }
         }
+
+        // JavaFX creates PieChart labels/legend nodes inside the chart skin.
+        // The default label color is too dark for MOMENTA's dark surfaces,
+        // so explicitly polish those generated nodes after CSS is applied.
+        Node pieNode = findById(root, "spendingCategoryChart");
+        if (pieNode instanceof PieChart pie) {
+            Platform.runLater(() -> {
+                pie.applyCss();
+                pie.layout();
+
+                for (Node labelNode : pie.lookupAll(".chart-pie-label")) {
+                    if (labelNode instanceof javafx.scene.text.Text text) {
+                        text.setFill(TEXT_2);
+                        text.setStroke(null);
+                        text.setFont(Font.font(FONT_BOLD, 12));
+                    }
+                }
+
+                for (Node lineNode : pie.lookupAll(".chart-pie-label-line")) {
+                    lineNode.setStyle(
+                            "-fx-stroke: " + hex(MUTED) + ";" +
+                            "-fx-stroke-width: 1;"
+                    );
+                }
+
+                for (Node legendNode : pie.lookupAll(".chart-legend-item")) {
+                    if (legendNode instanceof Label label) {
+                        label.setTextFill(TEXT_2);
+                        label.setFont(Font.font(FONT, 12));
+                    }
+                }
+
+                for (Node legendText : pie.lookupAll(".chart-legend-item-symbol")) {
+                    legendText.setEffect(glow(accent, 4));
+                }
+            });
+        }
+    }
+
+    private static void polishProgressBar(ProgressBar bar, Color accent) {
+        Runnable polish = () -> {
+            bar.applyCss();
+            bar.layout();
+
+            // Style both the ProgressBar and its generated Skin nodes.
+            // This prevents the platform's white/default track from leaking through.
+            bar.setStyle(
+                    "-fx-background-color: transparent;" +
+                    "-fx-control-inner-background: " + hex(SURFACE_3) + ";" +
+                    "-fx-accent: " + hex(accent) + ";" +
+                    "-fx-background-radius: 999;"
+            );
+
+            Node track = bar.lookup(".track");
+            if (track != null) {
+                track.setStyle(
+                        "-fx-background-color: " + hex(SURFACE_3) + ";" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-background-insets: 0;"
+                );
+            }
+
+            Node fill = bar.lookup(".bar");
+            if (fill != null) {
+                fill.setStyle(
+                        "-fx-background-color: " + hex(accent) + ";" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-background-insets: 0;"
+                );
+            }
+        };
+
+        Platform.runLater(polish);
+        // A second pass handles skins that are recreated during the first layout pulse.
+        Platform.runLater(() -> Platform.runLater(polish));
     }
 
     private static void styleFinance(Node root, Color accent) {
@@ -1090,6 +1485,20 @@ public final class MomentaTheme {
                 label.setFont(Font.font(FONT_BOLD, 20));
                 label.setTextFill(colors[i]);
             }
+        }
+
+        String[] iconIds = {"financeIncomeIcon", "financeExpenseIcon", "financeBalanceIcon", "financeSavingsIcon"};
+        for (int i = 0; i < iconIds.length; i++) {
+            Node n = findById(root, iconIds[i]);
+            if (n instanceof Label label) {
+                label.setTextFill(colors[i]);
+                label.setFont(Font.font(FONT_BOLD, 15));
+            }
+        }
+
+        Node chartSurface = findById(root, "categoryChartSurface");
+        if (chartSurface instanceof Region region) {
+            region.setEffect(glow(FINANCE_ACCENT, 7));
         }
     }
 
@@ -1238,24 +1647,57 @@ public final class MomentaTheme {
         button.setBorder(border(accent, 1));
         button.setCursor(javafx.scene.Cursor.HAND);
 
+        // Force the JavaFX skin itself to use the MOMENTA palette. This avoids
+        // the platform's default gray Modena button appearing over our dark UI.
+        setButtonSkin(button, SURFACE, TEXT, accent, 1);
+
         button.setOnMouseEntered(e -> {
-            button.setTranslateY(-1);
+            button.setTranslateY(-2);
+            button.setScaleX(1.015);
+            button.setScaleY(1.015);
             button.setTextFill(Color.WHITE);
             button.setBackground(background(accent.deriveColor(0, 0.22, 0.92, 1), 11));
             button.setBorder(border(accent, 1.4));
+            setButtonSkin(button, accent.deriveColor(0, 0.22, 0.92, 1), Color.WHITE, accent, 1.4);
             button.setEffect(glow(accent, 10));
         });
 
         button.setOnMouseExited(e -> {
             button.setTranslateY(0);
+            button.setScaleX(1);
+            button.setScaleY(1);
             button.setTextFill(TEXT);
             button.setBackground(background(SURFACE, 11));
             button.setBorder(border(accent, 1));
+            setButtonSkin(button, SURFACE, TEXT, accent, 1);
             button.setEffect(null);
         });
 
-        button.setOnMousePressed(e -> button.setTranslateY(1));
-        button.setOnMouseReleased(e -> button.setTranslateY(0));
+        button.setOnMousePressed(e -> {
+            button.setTranslateY(1);
+            button.setScaleX(0.99);
+            button.setScaleY(0.99);
+        });
+        button.setOnMouseReleased(e -> {
+            button.setTranslateY(0);
+            button.setScaleX(1.015);
+            button.setScaleY(1.015);
+        });
+    }
+
+    private static void setButtonSkin(Button button, Color fill, Color text, Color accent, double borderWidth) {
+        button.setStyle(
+                "-fx-background-color: " + hex(fill) + ";" +
+                "-fx-background-radius: 11;" +
+                "-fx-border-color: " + hex(accent) + ";" +
+                "-fx-border-width: " + borderWidth + ";" +
+                "-fx-border-radius: 11;" +
+                "-fx-text-fill: " + hex(text) + ";" +
+                "-fx-font-family: '" + FONT + "';" +
+                "-fx-font-size: 12.5px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;"
+        );
     }
 
     private static void styleInput(TextInputControl input, Color accent) {
@@ -1360,19 +1802,23 @@ public final class MomentaTheme {
 
     private static Label makePlaceholder(String id) {
         String text = switch (id == null ? "" : id) {
-            case "taskTable" -> "✦  No tasks yet  •  add your first next action";
-            case "goalTable" -> "✦  No goals yet  •  define what matters next";
-            case "projectTable" -> "✦  No projects yet  •  turn a goal into progress";
-            case "habitTable" -> "✦  No habits yet  •  build a small daily rhythm";
-            case "expenseTable" -> "✦  No expenses recorded yet";
-            case "incomeTable" -> "✦  No income recorded yet";
-            default -> "✦  Nothing here yet";
+            case "taskTable" -> "✦\nNo tasks yet\nAdd your first next action to get moving.";
+            case "goalTable" -> "✦\nNo goals yet\nDefine what matters next and keep it measurable.";
+            case "projectTable" -> "✦\nNo projects yet\nTurn a goal into visible progress.";
+            case "habitTable" -> "✦\nNo habits yet\nBuild a small daily rhythm.";
+            case "expenseTable" -> "✦\nNo expenses recorded yet\nYour spending history will appear here.";
+            case "incomeTable" -> "✦\nNo income recorded yet\nRecorded income will appear here.";
+            case "historyTable" -> "✦\nNo focus sessions yet\nComplete a session and it will appear here.";
+            default -> "✦\nNothing here yet";
         };
         Label label = new Label(text);
         label.setTextFill(MUTED);
         label.setFont(Font.font(FONT_BOLD, 13));
         label.setWrapText(true);
         label.setAlignment(javafx.geometry.Pos.CENTER);
+        label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        label.setMaxWidth(310);
+        label.setStyle("-fx-line-spacing: 4px;");
         return label;
     }
 
@@ -1556,15 +2002,99 @@ public final class MomentaTheme {
                         ? Background.EMPTY
                         : background(SURFACE, 0));
                 setPadding(new Insets(10, 12, 10, 12));
+
+                setOnMouseEntered(e -> {
+                    if (!empty) {
+                        setBackground(background(SURFACE_3, 0));
+                        setTextFill(TEXT);
+                    }
+                });
+                setOnMouseExited(e -> {
+                    if (!empty) {
+                        setBackground(background(SURFACE, 0));
+                        setTextFill(TEXT_2);
+                    }
+                });
+            }
+        });
+
+        Platform.runLater(() -> {
+            list.applyCss();
+            for (Node child : list.lookupAll(".placeholder .label")) {
+                if (node instanceof Label label) {
+                    label.setTextFill(MUTED);
+                    label.setFont(Font.font(FONT_BOLD, 12.5));
+                }
             }
         });
     }
 
     private static void styleHeroMetric(Node node, Color accent) {
         if (!(node instanceof Region card)) return;
-        card.setMinHeight(92);
-        card.setPadding(new Insets(16));
+
+        // TODAY'S OVERVIEW uses the same explicit card treatment as Finance:
+        // four clearly separated information blocks with visible borders.
+        final CornerRadii radius = new CornerRadii(18);
+        final Color normalBorder = accent.deriveColor(0, 0.68, 1.0, 0.82);
+        final Background normalBackground = new Background(new BackgroundFill(
+                cardGradient(accent), radius, Insets.EMPTY));
+
+        card.setMinWidth(210);
+        card.setPrefWidth(250);
+        card.setMaxWidth(270);
+        card.setMinHeight(126);
+        card.setPrefHeight(126);
+        card.setMaxHeight(126);
+        card.setPadding(new Insets(17, 18, 15, 18));
+        card.setBackground(normalBackground);
+        card.setBorder(new Border(new BorderStroke(
+                normalBorder, BorderStrokeStyle.SOLID, radius, new BorderWidths(1.35))));
         card.setEffect(softShadow(accent));
+
+        card.setOnMouseEntered(e -> {
+            card.setTranslateY(-4);
+            card.setBackground(new Background(new BackgroundFill(SURFACE_2, radius, Insets.EMPTY)));
+            card.setBorder(new Border(new BorderStroke(
+                    accent, BorderStrokeStyle.SOLID, radius, new BorderWidths(1.55))));
+            card.setEffect(glow(accent, 14));
+        });
+
+        card.setOnMouseExited(e -> {
+            card.setTranslateY(0);
+            card.setBackground(normalBackground);
+            card.setBorder(new Border(new BorderStroke(
+                    normalBorder, BorderStrokeStyle.SOLID, radius, new BorderWidths(1.35))));
+            card.setEffect(softShadow(accent));
+        });
+    }
+
+    private static void polishAllButtons(Node root, Color accent, String viewName) {
+        Runnable polish = () -> {
+            for (Node node : allNodes(root)) {
+                if (!(node instanceof Button button)) continue;
+
+                // Dashboard navigation has its own colored nav-button system.
+                if ("Dashboard".equals(viewName) && isInsideSidebar(button, root)) {
+                    continue;
+                }
+
+                styleButton(button, accent);
+            }
+        };
+
+        // First pass after CSS creation, then a second pass one pulse later.
+        // This covers both normal FXML buttons and skins recreated by JavaFX.
+        Platform.runLater(polish);
+        Platform.runLater(() -> Platform.runLater(polish));
+    }
+
+    private static boolean isInsideSidebar(Button button, Node root) {
+        Node current = button.getParent();
+        while (current != null && current != root) {
+            if ("sidebar".equals(current.getId())) return true;
+            current = current.getParent();
+        }
+        return "sidebar".equals(current == null ? null : current.getId());
     }
 
     private static Color moduleAccentFor(String label) {

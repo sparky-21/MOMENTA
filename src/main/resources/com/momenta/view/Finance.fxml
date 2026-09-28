@@ -1,98 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.PieChart?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.momenta.controller.FinanceController">
-
-    <top>
-        <VBox id="workspaceHeader" spacing="10" fillWidth="true">
-            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button text="← Dashboard" onAction="#onBackToDashboard"/>
-                <Label text="Finance">
-                    <font><Font name="System Bold" size="24"/></font>
-                </Label>
-            </HBox>
-            <FlowPane hgap="18" vgap="8" prefWrapLength="760" maxWidth="Infinity" alignment="CENTER_LEFT">
-                <VBox id="financeIncomeCard" minWidth="140">
-                    <Label text="Income"/>
-                    <Label fx:id="incomeLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
-                </VBox>
-                <VBox id="financeExpenseCard" minWidth="140">
-                    <Label text="Expenses"/>
-                    <Label fx:id="expenseLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
-                </VBox>
-                <VBox id="financeBalanceCard" minWidth="140">
-                    <Label text="Balance"/>
-                    <Label fx:id="balanceLabel" text="৳ 0.00"><font><Font name="System Bold" size="16"/></font></Label>
-                </VBox>
-                <VBox id="financeSavingsCard" minWidth="140">
-                    <Label text="Savings Rate"/>
-                    <Label fx:id="savingsLabel" text="0.0%"><font><Font name="System Bold" size="16"/></font></Label>
-                </VBox>
-            </FlowPane>
-            <FlowPane hgap="8" vgap="8" prefWrapLength="760" maxWidth="Infinity">
-                <Button text="Add Expense" onAction="#onAddExpense"/>
-                <Button text="Edit Expense" onAction="#onEditExpense"/>
-                <Button text="Delete Expense" onAction="#onDeleteExpense"/>
-                <Button text="Add Income" onAction="#onAddIncome"/>
-                <Button text="Edit Income" onAction="#onEditIncome"/>
-                <Button text="Delete Income" onAction="#onDeleteIncome"/>
-            </FlowPane>
-        </VBox>
-    </top>
-
-    <center>
-        <ScrollPane id="workspaceBody" fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
-            <content>
-                <FlowPane hgap="16" vgap="16" prefWrapLength="980" maxWidth="Infinity">
-                    <padding><Insets top="6" right="24" bottom="20" left="24"/></padding>
-
-                    <VBox spacing="8" minWidth="320" minHeight="420" prefWidth="520">
-                        <Label text="Expenses"><font><Font name="System Bold" size="14"/></font></Label>
-                        <TableView id="expenseTableSurface" fx:id="expenseTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
-                            <columns>
-                                <TableColumn fx:id="expenseDateColumn" text="Date" prefWidth="90"/>
-                                <TableColumn fx:id="expenseCategoryColumn" text="Category" prefWidth="100"/>
-                                <TableColumn fx:id="expenseNoteColumn" text="Note" prefWidth="100"/>
-                                <TableColumn fx:id="expenseAmountColumn" text="Amount" prefWidth="80"/>
-                            </columns>
-                        </TableView>
-                    </VBox>
-
-                    <VBox spacing="8" minWidth="260" minHeight="420" prefWidth="360">
-                        <Label text="Income"><font><Font name="System Bold" size="14"/></font></Label>
-                        <TableView id="incomeTableSurface" fx:id="incomeTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
-                            <columns>
-                                <TableColumn fx:id="incomeDateColumn" text="Date" prefWidth="100"/>
-                                <TableColumn fx:id="incomeSourceColumn" text="Source" prefWidth="100"/>
-                                <TableColumn fx:id="incomeAmountColumn" text="Amount" prefWidth="90"/>
-                            </columns>
-                        </TableView>
-                    </VBox>
-
-                    <VBox spacing="8" minWidth="240" minHeight="420" prefWidth="320">
-                        <Label text="Spending by Category"><font><Font name="System Bold" size="14"/></font></Label>
-                        <PieChart id="categoryChartSurface" fx:id="categoryChart" legendVisible="true" labelsVisible="true" VBox.vgrow="ALWAYS"
-                                  minWidth="240" minHeight="360" maxWidth="Infinity"/>
-                    </VBox>
-                </FlowPane>
-            </content>
-        </ScrollPane>
-    </center>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.momenta.controller.FinanceController">
+    <top><VBox id="workspaceHeader" spacing="12" fillWidth="true"><padding><Insets top="20" right="28" bottom="16" left="28"/></padding>
+        <HBox spacing="12" alignment="CENTER_LEFT"><Button text="← Dashboard" onAction="#onBackToDashboard"/><VBox spacing="2" HBox.hgrow="ALWAYS"><Label text="FINANCE • MONEY SNAPSHOT"><font><Font name="System Bold" size="28"/></font></Label><Label text="See income, spending, balance and category mix in one place."/></VBox></HBox>
+        <FlowPane hgap="14" vgap="14" prefWrapLength="1000" maxWidth="Infinity">
+            <VBox id="financeIncomeCard" minWidth="180" prefWidth="230"><Label text="INCOME"/><Label fx:id="incomeLabel" text="৳ 0.00"><font><Font name="System Bold" size="21"/></font></Label><Label id="financeIncomeIcon" text="↗"/></VBox>
+            <VBox id="financeExpenseCard" minWidth="180" prefWidth="230"><Label text="EXPENSES"/><Label fx:id="expenseLabel" text="৳ 0.00"><font><Font name="System Bold" size="21"/></font></Label><Label id="financeExpenseIcon" text="↘"/></VBox>
+            <VBox id="financeBalanceCard" minWidth="180" prefWidth="230"><Label text="BALANCE"/><Label fx:id="balanceLabel" text="৳ 0.00"><font><Font name="System Bold" size="21"/></font></Label><Label id="financeBalanceIcon" text="◉"/></VBox>
+            <VBox id="financeSavingsCard" minWidth="180" prefWidth="230"><Label text="SAVINGS RATE"/><Label fx:id="savingsLabel" text="0.0%"><font><Font name="System Bold" size="21"/></font></Label><Label id="financeSavingsIcon" text="✦"/></VBox>
+        </FlowPane>
+        <FlowPane id="actionBar" hgap="8" vgap="8" prefWrapLength="900"><Button text="＋ Expense" onAction="#onAddExpense"/><Button text="Edit Expense" onAction="#onEditExpense"/><Button text="Delete Expense" onAction="#onDeleteExpense"/><Button text="＋ Income" onAction="#onAddIncome"/><Button text="Edit Income" onAction="#onEditIncome"/><Button text="Delete Income" onAction="#onDeleteIncome"/></FlowPane>
+    </VBox></top>
+    <center><ScrollPane id="workspaceBody" fitToWidth="true" pannable="true"><content><VBox spacing="16" fillWidth="true"><padding><Insets top="8" right="28" bottom="24" left="28"/></padding>
+        <FlowPane id="financeWorkspaceGrid" hgap="16" vgap="16" prefWrapLength="1050" maxWidth="Infinity">
+            <VBox id="expenseTableSurface" spacing="8" minWidth="450" prefWidth="610" minHeight="430"><Label text="EXPENSES"><font><Font name="System Bold" size="16"/></font></Label><Label text="Recent outgoing transactions."/><TableView fx:id="expenseTable" VBox.vgrow="ALWAYS"><columns><TableColumn fx:id="expenseDateColumn" text="Date" prefWidth="95"/><TableColumn fx:id="expenseCategoryColumn" text="Category" prefWidth="120"/><TableColumn fx:id="expenseNoteColumn" text="Note" prefWidth="170"/><TableColumn fx:id="expenseAmountColumn" text="Amount" prefWidth="100"/></columns></TableView></VBox>
+            <VBox id="incomeTableSurface" spacing="8" minWidth="330" prefWidth="420" minHeight="430"><Label text="INCOME"><font><Font name="System Bold" size="16"/></font></Label><Label text="Recorded incoming money."/><TableView fx:id="incomeTable" VBox.vgrow="ALWAYS"><columns><TableColumn fx:id="incomeDateColumn" text="Date" prefWidth="110"/><TableColumn fx:id="incomeSourceColumn" text="Source" prefWidth="150"/><TableColumn fx:id="incomeAmountColumn" text="Amount" prefWidth="100"/></columns></TableView></VBox>
+            <VBox id="categoryChartSurface" spacing="8" minWidth="360" prefWidth="470" minHeight="430"><Label text="SPENDING BY CATEGORY"><font><Font name="System Bold" size="16"/></font></Label><Label text="A visual breakdown of recorded expenses."/><PieChart fx:id="categoryChart" legendVisible="true" labelsVisible="true" VBox.vgrow="ALWAYS"/></VBox>
+        </FlowPane>
+    </VBox></content></ScrollPane></center>
 </BorderPane>

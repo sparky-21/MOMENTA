@@ -8,68 +8,108 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane id="settingsRoot" fitToWidth="true" fitToHeight="true" pannable="true"
-            xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.momenta.controller.SettingsController">
-    <content>
-        <VBox spacing="18" maxWidth="900">
-            <padding><Insets top="28" right="32" bottom="32" left="32"/></padding>
+<BorderPane fx:id="root" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.momenta.controller.SettingsController"
+            style="-fx-background-color: #0c0915;">
 
-            <HBox spacing="12" alignment="CENTER_LEFT">
-                <Button text="← Dashboard" onAction="#onBack"/>
-                <Label text="Settings &amp; Personalization">
-                    <font><Font name="System Bold" size="27"/></font>
+    <top>
+        <HBox spacing="14" alignment="CENTER_LEFT" style="-fx-padding: 24 30 18 30; -fx-background-color: #0c0915;">
+            <Button text="← Dashboard" onAction="#onBackToDashboard"
+                    style="-fx-background-color: transparent; -fx-text-fill: #dedcf5; -fx-border-color: #3b3266; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 8 16; -fx-cursor: hand;"/>
+            <VBox spacing="3" HBox.hgrow="ALWAYS">
+                <Label text="SETTINGS • PERSONALIZATION" textFill="WHITE">
+                    <font><Font name="System Bold" size="24"/></font>
                 </Label>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="⏻  Logout" onAction="#onLogout"/>
-            </HBox>
-            <Label fx:id="accountLabel" text="Personal settings"/>
-            <Separator/>
-
-            <VBox id="settingsAppearanceCard" spacing="12">
-                <Label text="Appearance">
-                    <font><Font name="System Bold" size="19"/></font>
+                <Label fx:id="userSubtitleLabel" text="Personal settings for your account" textFill="#8f88ab">
+                    <font><Font size="13"/></font>
                 </Label>
-                <HBox spacing="14" alignment="CENTER_LEFT">
-                    <Label text="Theme" minWidth="150"/>
-                    <ComboBox fx:id="themeBox" prefWidth="220"/>
-                </HBox>
-                <HBox spacing="14" alignment="CENTER_LEFT">
-                    <Label text="Accent color" minWidth="150"/>
-                    <ComboBox fx:id="accentBox" prefWidth="220"/>
-                </HBox>
-                <HBox spacing="14" alignment="CENTER_LEFT">
-                    <Label text="Font scale" minWidth="150"/>
-                    <Slider fx:id="fontScaleSlider" prefWidth="300" showTickLabels="true" showTickMarks="true"/>
-                    <Label fx:id="fontScaleLabel" text="100%" minWidth="45"/>
-                </HBox>
-                <CheckBox fx:id="animationsCheck" text="Enable interface animations" selected="true"/>
-                <CheckBox fx:id="compactCheck" text="Use compact spacing"/>
             </VBox>
+            <Button text="⏻ Logout" onAction="#onLogout"
+                    style="-fx-background-color: #1a1530; -fx-text-fill: #ff8fb1; -fx-border-color: #4d2b45; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 8 16; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
 
-            <Separator/>
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background: #0c0915; -fx-background-color: #0c0915; -fx-border-color: transparent;">
+            <content>
+                <VBox spacing="24" fillWidth="true" style="-fx-padding: 10 32 36 32;">
 
-            <VBox id="settingsStartupCard" spacing="12">
-                <Label text="Startup">
-                    <font><Font name="System Bold" size="19"/></font>
-                </Label>
-                <HBox spacing="14" alignment="CENTER_LEFT">
-                    <Label text="After login, open" minWidth="150"/>
-                    <ComboBox fx:id="landingViewBox" prefWidth="220"/>
-                </HBox>
-                <Label text="This preference is applied the next time you log in." wrapText="true"/>
-            </VBox>
+                    <!-- Appearance Section -->
+                    <VBox spacing="16" style="-fx-background-color: #120e24; -fx-background-radius: 18; -fx-border-color: #251f47; -fx-border-radius: 18; -fx-padding: 22;">
+                        <Label text="Appearance" textFill="WHITE">
+                            <font><Font name="System Bold" size="18"/></font>
+                        </Label>
+                        <Label text="Keep the interface consistent, readable and personal without changing the application structure." textFill="#8f88ab"/>
 
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox spacing="12" alignment="CENTER_RIGHT">
-                <Button text="Reset Defaults" onAction="#onReset"/>
-                <Button text="Save Settings" onAction="#onApply"/>
-            </HBox>
-        </VBox>
-    </content>
-</ScrollPane>
+                        <HBox spacing="18" alignment="CENTER_LEFT">
+                            <Label text="Theme" prefWidth="120" textFill="#dedcf5"/>
+                            <ComboBox fx:id="themeComboBox" prefWidth="280"
+                                      style="-fx-background-color: #1c1836; -fx-background-radius: 10; -fx-border-color: #3b3266; -fx-border-radius: 10; -fx-padding: 4 10; -fx-cursor: hand;"/>
+                        </HBox>
+
+                        <HBox spacing="18" alignment="CENTER_LEFT">
+                            <Label text="Accent color" prefWidth="120" textFill="#dedcf5"/>
+                            <ComboBox fx:id="accentColorComboBox" prefWidth="280"
+                                      style="-fx-background-color: #1c1836; -fx-background-radius: 10; -fx-border-color: #3b3266; -fx-border-radius: 10; -fx-padding: 4 10; -fx-cursor: hand;"/>
+                        </HBox>
+
+                        <HBox spacing="18" alignment="CENTER_LEFT">
+                            <Label text="Font scale" prefWidth="120" textFill="#dedcf5"/>
+                            <Slider fx:id="fontScaleSlider" min="85" max="125" value="100" prefWidth="300"
+                                    showTickLabels="true" showTickMarks="true" majorTickUnit="10"/>
+                            <Label fx:id="fontScaleLabel" text="100%" textFill="#a594fd"/>
+                        </HBox>
+
+                        <VBox spacing="10">
+                            <CheckBox fx:id="animationsCheckBox" text="Enable interface animations" textFill="#dedcf5" selected="true"/>
+                            <CheckBox fx:id="compactSpacingCheckBox" text="Use compact spacing" textFill="#dedcf5"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Startup Section -->
+                    <VBox spacing="16" style="-fx-background-color: #120e24; -fx-background-radius: 18; -fx-border-color: #251f47; -fx-border-radius: 18; -fx-padding: 22;">
+                        <Label text="Startup" textFill="WHITE">
+                            <font><Font name="System Bold" size="18"/></font>
+                        </Label>
+                        <Label text="Choose which workspace opens after login." textFill="#8f88ab"/>
+
+                        <HBox spacing="18" alignment="CENTER_LEFT">
+                            <Label text="After login, open" prefWidth="120" textFill="#dedcf5"/>
+                            <ComboBox fx:id="startupPageComboBox" prefWidth="280"
+                                      style="-fx-background-color: #1c1836; -fx-background-radius: 10; -fx-border-color: #3b3266; -fx-border-radius: 10; -fx-padding: 4 10; -fx-cursor: hand;"/>
+                        </HBox>
+                        <Label text="This preference is applied the next time you log in." textFill="#686180">
+                            <font><Font size="11"/></font>
+                        </Label>
+                    </VBox>
+
+                    <!-- Momenta Visual System (Subtle & Convenient Sentence) -->
+                    <VBox spacing="8" style="-fx-padding: 4 4 4 4;">
+                        <Label text="MOMENTA VISUAL SYSTEM" textFill="#dedcf5">
+                            <font><Font name="Segoe UI Bold" size="14"/></font>
+                        </Label>
+                        <!-- Convenient non-technical text -->
+                        <Label text="High-contrast ambient surfaces and distraction-free layouts designed to support continuous focus and productivity." textFill="#8f88ab" wrapText="true">
+                            <font><Font size="12.5"/></font>
+                        </Label>
+                    </VBox>
+
+                    <!-- Bottom Buttons with matched Dark Theme -->
+                    <HBox spacing="14" alignment="CENTER_RIGHT">
+                        <Button text="Reset Defaults" onAction="#onResetDefaults"
+                                style="-fx-background-color: #1b1733; -fx-text-fill: #dedcf5; -fx-border-color: #3b3266; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 22; -fx-cursor: hand;"/>
+                        <Button text="Save Settings" onAction="#onSaveSettings"
+                                style="-fx-background-color: #6d4aff; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold; -fx-padding: 10 26; -fx-cursor: hand;"/>
+                    </HBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

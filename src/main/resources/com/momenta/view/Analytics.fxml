@@ -12,10 +12,8 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -27,10 +25,12 @@
     <top>
         <HBox id="workspaceHeader" spacing="12" alignment="CENTER_LEFT">
             <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
-            <Label text="MOMENTA ANALYTICS">
-                <font><Font name="System Bold" size="24"/></font>
-            </Label>
-            <Region HBox.hgrow="ALWAYS"/>
+            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                <Label text="MOMENTA ANALYTICS">
+                    <font><Font name="System Bold" size="24"/></font>
+                </Label>
+                <Label text="See the patterns behind your tasks, habits, focus and spending."/>
+            </VBox>
             <Button text="Refresh" onAction="#onRefresh"/>
             <Button text="Back to Dashboard" onAction="#onBackToDashboard"/>
         </HBox>
@@ -62,37 +62,56 @@
 
                     <Separator/>
 
-                    <FlowPane hgap="24" vgap="14" prefWrapLength="760" maxWidth="Infinity">
-                        <VBox spacing="6" minWidth="190">
-                            <Label text="Task Completion"><font><Font name="System Bold" size="15"/></font></Label>
+                    <FlowPane id="analyticsMiniMetrics" hgap="12" vgap="12" prefWrapLength="760" maxWidth="Infinity">
+                        <VBox id="analyticsTaskMetric" spacing="5" minWidth="190" prefWidth="220">
+                            <Label text="TASK COMPLETION"/>
                             <Label fx:id="taskCompletionLabel" text="0 / 0 (0%)"/>
                         </VBox>
-                        <VBox spacing="6" minWidth="190">
-                            <Label text="Goal Completion"><font><Font name="System Bold" size="15"/></font></Label>
+                        <VBox id="analyticsGoalMetric" spacing="5" minWidth="190" prefWidth="220">
+                            <Label text="GOAL COMPLETION"/>
                             <Label fx:id="goalCompletionLabel" text="0 / 0 (0%)"/>
                         </VBox>
-                        <VBox spacing="6" minWidth="190">
-                            <Label text="Focus Score"><font><Font name="System Bold" size="15"/></font></Label>
+                        <VBox id="analyticsFocusMetric" spacing="5" minWidth="190" prefWidth="220">
+                            <Label text="FOCUS SCORE"/>
                             <Label fx:id="focusScoreLabel" text="0 / 100"/>
                         </VBox>
                     </FlowPane>
 
                     <Label fx:id="financeLabel" text="Income: 0.00    Expenses: 0.00    Balance: 0.00" wrapText="true"/>
 
-                    <Label text="Weekly Focus Minutes"><font><Font name="System Bold" size="17"/></font></Label>
-                    <BarChart id="focusChartSurface" fx:id="focusChart" animated="false" legendVisible="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
-                        <xAxis><CategoryAxis label="Date"/></xAxis>
-                        <yAxis><NumberAxis label="Minutes"/></yAxis>
-                    </BarChart>
+                    <FlowPane id="analyticsChartGrid" hgap="18" vgap="18" prefWrapLength="1080" maxWidth="Infinity">
+                        <VBox id="focusChartSurface" spacing="8" minWidth="380" prefWidth="520" maxWidth="700">
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                    <Label text="WEEKLY FOCUS MINUTES"><font><Font name="System Bold" size="16"/></font></Label>
+                                    <Label text="Focus time across the week."/>
+                                </VBox>
+                            </HBox>
+                            <BarChart fx:id="focusChart" animated="false" legendVisible="false" minHeight="280" prefHeight="330" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+                                <xAxis><CategoryAxis label="Date"/></xAxis>
+                                <yAxis><NumberAxis label="Minutes"/></yAxis>
+                            </BarChart>
+                        </VBox>
 
-                    <Label text="Weekly Spending Trend"><font><Font name="System Bold" size="17"/></font></Label>
-                    <LineChart id="spendingChartSurface" fx:id="spendingChart" animated="false" minHeight="280" prefHeight="320" maxWidth="Infinity">
-                        <xAxis><CategoryAxis label="Date"/></xAxis>
-                        <yAxis><NumberAxis label="Amount"/></yAxis>
-                    </LineChart>
+                        <VBox id="spendingChartSurface" spacing="8" minWidth="380" prefWidth="520" maxWidth="700">
+                            <VBox spacing="2">
+                                <Label text="WEEKLY SPENDING TREND"><font><Font name="System Bold" size="16"/></font></Label>
+                                <Label text="How spending moves across the week."/>
+                            </VBox>
+                            <LineChart fx:id="spendingChart" animated="false" minHeight="280" prefHeight="330" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+                                <xAxis><CategoryAxis label="Date"/></xAxis>
+                                <yAxis><NumberAxis label="Amount"/></yAxis>
+                            </LineChart>
+                        </VBox>
+                    </FlowPane>
 
-                    <Label text="Spending by Category"><font><Font name="System Bold" size="17"/></font></Label>
-                    <PieChart id="spendingCategoryChartSurface" fx:id="spendingCategoryChart" minHeight="300" prefHeight="340" maxWidth="Infinity"/>
+                    <VBox id="spendingCategoryChartSurface" spacing="8" minHeight="390" maxWidth="Infinity">
+                        <VBox spacing="2">
+                            <Label text="SPENDING BY CATEGORY"><font><Font name="System Bold" size="16"/></font></Label>
+                            <Label text="A clear part-to-whole view of your recorded expenses."/>
+                        </VBox>
+                        <PieChart fx:id="spendingCategoryChart" minHeight="330" prefHeight="360" maxWidth="Infinity" VBox.vgrow="ALWAYS"/>
+                    </VBox>
                 </VBox>
             </content>
         </ScrollPane>

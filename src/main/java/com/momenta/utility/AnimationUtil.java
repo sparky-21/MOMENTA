@@ -7,12 +7,6 @@ import javafx.util.Duration;
 
 import java.util.List;
 
-/**
- * Phase 20 — Central JavaFX animation helper.
- *
- * Animations are intentionally short and subtle so MOMENTA feels responsive
- * without becoming distracting. No CSS is used.
- */
 public final class AnimationUtil {
 
     private AnimationUtil() {
@@ -108,6 +102,23 @@ public final class AnimationUtil {
                         new KeyValue(bar.progressProperty(), bar.getProgress())),
                 new KeyFrame(Duration.millis(450),
                         new KeyValue(bar.progressProperty(), safeTarget, Interpolator.EASE_BOTH))
+        );
+        timeline.play();
+    }
+
+    /**
+     * Animates a circular JavaFX Arc from its current sweep to a target sweep.
+     * Supports negative angles for clockwise progress.
+     */
+    public static void animateArc(javafx.scene.shape.Arc arc, double targetDegrees) {
+        if (arc == null) return;
+        double safeTarget = Math.max(-360.0, Math.min(360.0, targetDegrees));
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(arc.lengthProperty(), arc.getLength())),
+                new KeyFrame(Duration.millis(700),
+                        new KeyValue(arc.lengthProperty(), safeTarget, Interpolator.EASE_BOTH))
         );
         timeline.play();
     }

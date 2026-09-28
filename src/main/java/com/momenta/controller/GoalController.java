@@ -11,7 +11,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +60,26 @@ public class GoalController extends AbstractScreenController {
         });
 
         goalTable.setItems(goals);
+        configureModernGoalRows();
         refresh();
+    }
+
+    private void configureModernGoalRows() {
+        goalTable.setRowFactory(table -> new TableRow<>() {
+            @Override protected void updateItem(Goal item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setBackground(Background.EMPTY); setBorder(Border.EMPTY); return; }
+                setBackground(new Background(new BackgroundFill(com.momenta.utility.MomentaTheme.SURFACE, new CornerRadii(10), Insets.EMPTY)));
+                setBorder(new Border(new BorderStroke(com.momenta.utility.MomentaTheme.GOALS_ACCENT.deriveColor(0,0.6,1,0.35), BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1))));
+                setPrefHeight(54);
+            }
+        });
+        progressColumn.setCellFactory(col -> new TableCell<>() {
+            private final ProgressBar bar = new ProgressBar(); private final Label label = new Label(); private final HBox box = new HBox(7, bar, label);
+            { bar.setPrefWidth(58); box.setAlignment(Pos.CENTER_LEFT); }
+            @Override protected void updateItem(Number value, boolean empty) { super.updateItem(value, empty); if(empty||value==null){setGraphic(null);return;} int p=value.intValue(); bar.setProgress(p/100.0); label.setText(p+"%"); setGraphic(box); }
+        });
+        statusColumn.setCellFactory(col -> new TableCell<>() { @Override protected void updateItem(String value, boolean empty){ super.updateItem(value,empty); setText(empty||value==null?null:("ACTIVE".equals(value)?"● Active":"○ "+value)); }});
     }
 
     /** {@inheritDoc} For Goals, "refresh" means reloading the goal list. */

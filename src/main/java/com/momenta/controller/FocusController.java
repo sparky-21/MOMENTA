@@ -1,88 +1,105 @@
 package com.momenta.controller;
 
+import com.momenta.dao.FocusSessionDAO;
+import com.momenta.dao.impl.FocusSessionDAOImpl;
 import com.momenta.model.FocusSession;
 import com.momenta.model.Task;
 import com.momenta.service.FocusSessionService;
 import com.momenta.service.TaskService;
 import com.momenta.threading.TaskExecutor;
 import com.momenta.utility.AlertUtil;
-import com.momenta.utility.AnimationUtil;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
-import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
-import java.util.HashMap;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
-/** Phase 9 — Focus Mode controller. UI work stays on the JavaFX thread. */
 public class FocusController {
 
-    @FXML private ComboBox<Task> taskCombo;
-    @FXML private Spinner<Integer> durationSpinner;
+    @FXML private BorderPane root;
     @FXML private Label timerLabel;
     @FXML private Label statusLabel;
-    @FXML private TableView<FocusSession> historyTable;
-    @FXML private TableColumn<FocusSession, String> historyTaskColumn;
-    @FXML private TableColumn<FocusSession, Number> historyDurationColumn;
-    @FXML private TableColumn<FocusSession, String> historyStartedColumn;
+    @FXML private Label sessionTypeLabel;
+    @FXML private Label historySummaryLabel;
+    @FXML private StackPane timerCircle;
+
+    @FXML private ComboBox<Task> taskComboBox;
+    @FXML private Spinner<Integer> durationSpinner;
+
+    @FXML private Button startButton;
+    @FXML private Button pauseButton;
+    @FXML private Button resumeButton;
+    @FXML private Button stopButton;
 
     private final TaskService taskService = new TaskService();
-    private final FocusSessionService focusService = new FocusSessionService();
-    private Timeline timeline;
-    private FocusSession activeSession;
-    private Task activeTask;
-    private int remainingSeconds;
-    private boolean running;
-    // Guards against a double finish (e.g. the 1-second Timeline tick
-    // reaching zero at the same moment the user clicks Stop) sending two
-    // concurrent "finish" background tasks for the same session.
-    private boolean finishing;
+    private final FocusSessionService focusSessionService = new FocusSessionService();
+    private final FocusSessionDAO focusSessionDAO = new FocusSessionDAOImpl();
 
-    // Task titles for the history table used to be looked up with a fresh
-    // taskService.getAllTasks(...) database call inside the TableColumn's
-    // cellValueFactory — which JavaFX invokes on the FX Application Thread
-    // every time a row is rendered (initial load, scroll, resize...). That
-    // meant a full DB query per cell-render on the UI thread, violating
-    // Rule #14 far more often than a one-off screen load would. Titles are
-    // now loaded once in the background alongside the history itself and
-    // cached here; the cellValueFactory only ever reads this in-memory map.
-    private final Map<Integer, String> taskTitleCache = new HashMap<>();
+    private Timeline timer;
+    private int remainingSeconds = 25 * 60;
+    private int selectedDurationMinutes = 25;
+    private boolean isRunning = false;
+    private LocalDateTime sessionStartTime;
 
     @FXML
     public void initialize() {
-        durationSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 180, 25));
-        historyTaskColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
-                cell.getValue().getTaskId() == null
-                        ? "General Focus"
-                        : taskTitleCache.getOrDefault(cell.getValue().getTaskId(), "Task #" + cell.getValue().getTaskId())));
-        historyDurationColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleIntegerProperty(cell.getValue().getDurationMinutes()));
-        historyStartedColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getStartedAt()));
+        SpinnerValueFactory<Integer> valueFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(5, 120, 25, 5);
+        durationSpinner.setValueFactory(valueFactory);
 
-        // Task combo shows the task title, not Task@<hash> — Task has no
-        // toString() override (unlike Goal/Event), so a cell factory is used
-        // here instead of touching the shared model class.
-        javafx.util.Callback<javafx.scene.control.ListView<Task>, javafx.scene.control.ListCell<Task>> taskCellFactory =
-                list -> new javafx.scene.control.ListCell<>() {
-                    @Override
-                    protected void updateItem(Task task, boolean empty) {
-                        super.updateItem(task, empty);
-                        setText(empty || task == null ? null : task.getTitle());
-                    }
-                };
-        taskCombo.setCellFactory(taskCellFactory);
-        taskCombo.setButtonCell(taskCellFactory.call(null));
+        // Spinner dark style
+        durationSpinner.getEditor().setStyle("-fx-background-color: #1c1836; -fx-text-fill: #ffffff; -fx-alignment: CENTER; -fx-font-weight: bold;");
 
-        // Section 21 / Rule #14: never block the JavaFX Application Thread
-        // with a database read — both loads run on TaskExecutor's pool and
-        // only touch the UI in setOnSucceeded.
+        durationSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (!isRunning && newVal != null) {
+                selectedDurationMinutes = newVal;
+                remainingSeconds = newVal * 60;
+                updateTimerDisplay();
+            }
+        });
+
+        // ComboBox dropdown dark styling
+        taskComboBox.setButtonCell(createTaskCell());
+        taskComboBox.setCellFactory(listView -> createTaskCell());
+
+        updateControlsState(false, false);
         loadTasks();
         loadHistory();
-        showTime(durationSpinner.getValue() * 60);
+        updateTimerDisplay();
+    }
+
+    private ListCell<Task> createTaskCell() {
+        return new ListCell<>() {
+            @Override
+            protected void updateItem(Task task, boolean empty) {
+                super.updateItem(task, empty);
+                if (empty || task == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("-fx-background-color: #1c1836; -fx-text-fill: #8f88ab;");
+                } else {
+                    setText(task.getTitle());
+                    setTextFill(Color.WHITE);
+                    setFont(Font.font("Segoe UI", 12.5));
+                    setStyle("-fx-background-color: #1c1836; -fx-text-fill: white; -fx-padding: 6 10;");
+                }
+            }
+        };
     }
 
     private void loadTasks() {
@@ -93,166 +110,138 @@ public class FocusController {
                 return taskService.getIncompleteTasks(uid);
             }
         };
-        loadTask.setOnSucceeded(e -> taskCombo.getItems().setAll(loadTask.getValue()));
-        loadTask.setOnFailed(e -> AlertUtil.showError("Focus Mode",
-                "Could not load tasks.", loadTask.getException()));
+        loadTask.setOnSucceeded(e -> {
+            taskComboBox.getItems().setAll(loadTask.getValue());
+            if (!taskComboBox.getItems().isEmpty()) {
+                taskComboBox.getSelectionModel().selectFirst();
+            }
+        });
         TaskExecutor.getInstance().workPool().submit(loadTask);
     }
 
     private void loadHistory() {
         final int uid = CurrentUser.getId();
-        javafx.concurrent.Task<HistoryData> loadTask = new javafx.concurrent.Task<>() {
+        javafx.concurrent.Task<List<FocusSession>> loadTask = new javafx.concurrent.Task<>() {
             @Override
-            protected HistoryData call() {
-                List<FocusSession> sessions = focusService.getHistory(uid);
-                Map<Integer, String> titles = new HashMap<>();
-                for (Task t : taskService.getAllTasks(uid)) {
-                    titles.put(t.getId(), t.getTitle());
-                }
-                return new HistoryData(sessions, titles);
+            protected List<FocusSession> call() {
+                return focusSessionService.getHistory(uid);
             }
         };
         loadTask.setOnSucceeded(e -> {
-            HistoryData data = loadTask.getValue();
-            taskTitleCache.clear();
-            taskTitleCache.putAll(data.titles());
-            historyTable.getItems().setAll(data.sessions());
+            List<FocusSession> sessions = loadTask.getValue();
+            long totalMinutes = sessions.stream()
+                    .filter(s -> s.getStartedAt() != null && s.getStartedAt().startsWith(LocalDate.now().toString()))
+                    .mapToLong(FocusSession::getDurationMinutes)
+                    .sum();
+            historySummaryLabel.setText("You have logged " + totalMinutes + " minutes of deep work across "
+                    + sessions.size() + " session(s) today.");
         });
-        loadTask.setOnFailed(e -> AlertUtil.showError("Focus Mode",
-                "Could not load session history.", loadTask.getException()));
         TaskExecutor.getInstance().workPool().submit(loadTask);
     }
 
     @FXML
     private void onStart() {
-        if (running) return;
-        final Task selectedTask = taskCombo.getValue();
-        final int minutes = durationSpinner.getValue();
+        if (isRunning) return;
+        selectedDurationMinutes = durationSpinner.getValue();
+        remainingSeconds = selectedDurationMinutes * 60;
+        sessionStartTime = LocalDateTime.now();
 
-        // focusService.start() is an INSERT — moved off the FX thread like
-        // every other write in this pass. The controls are disabled
-        // immediately so a second click can't fire a second session while
-        // this one is still being saved.
-        durationSpinner.setDisable(true);
-        taskCombo.setDisable(true);
-        statusLabel.setText("Starting…");
-
-        javafx.concurrent.Task<FocusSession> startTask = new javafx.concurrent.Task<>() {
-            @Override
-            protected FocusSession call() {
-                return focusService.start(CurrentUser.getId(), selectedTask, minutes);
-            }
-        };
-
-        startTask.setOnSucceeded(e -> {
-            activeTask = selectedTask;
-            activeSession = startTask.getValue();
-            remainingSeconds = minutes * 60;
-            running = true;
-            finishing = false;
-            statusLabel.setText("Focus session running");
-
-            timeline = new Timeline(new KeyFrame(Duration.seconds(1), ev -> tick()));
-            timeline.setCycleCount(Timeline.INDEFINITE);
-            timeline.play();
-        });
-
-        startTask.setOnFailed(e -> {
-            AlertUtil.showError("Focus Mode", "Could not start the focus session.", startTask.getException());
-            durationSpinner.setDisable(false);
-            taskCombo.setDisable(false);
-            statusLabel.setText("");
-        });
-
-        TaskExecutor.getInstance().workPool().submit(startTask);
-    }
-
-    private void tick() {
-        remainingSeconds--;
-        showTime(remainingSeconds);
-        if (remainingSeconds <= 0) finishSession();
+        startTimer();
+        isRunning = true;
+        updateControlsState(true, false);
+        statusLabel.setText("Focusing on: " + getSelectedTaskTitle());
     }
 
     @FXML
     private void onPause() {
-        if (timeline != null && running) {
-            timeline.pause();
-            running = false;
-            statusLabel.setText("Paused");
-        }
+        if (!isRunning || timer == null) return;
+        timer.pause();
+        statusLabel.setText("Session Paused");
+        updateControlsState(true, true);
     }
 
     @FXML
     private void onResume() {
-        if (timeline != null && !running && activeSession != null && remainingSeconds > 0) {
-            timeline.play();
-            running = true;
-            statusLabel.setText("Focus session running");
-        }
+        if (timer == null) return;
+        timer.play();
+        statusLabel.setText("Focusing on: " + getSelectedTaskTitle());
+        updateControlsState(true, false);
     }
 
     @FXML
     private void onStop() {
-        if (activeSession == null) return;
-        finishSession();
+        if (timer != null) timer.stop();
+        isRunning = false;
+
+        saveSessionIfEligible();
+        remainingSeconds = durationSpinner.getValue() * 60;
+        updateTimerDisplay();
+        statusLabel.setText("Ready");
+        updateControlsState(false, false);
+        loadHistory();
     }
 
-    private void finishSession() {
-        if (finishing || activeSession == null) return;
-        finishing = true;
-
-        if (timeline != null) timeline.stop();
-        running = false;
-
-        final FocusSession sessionToFinish = activeSession;
-        final Task taskToFinish = activeTask;
-
-        javafx.concurrent.Task<Void> finishTask = new javafx.concurrent.Task<>() {
-            @Override
-            protected Void call() {
-                focusService.finish(sessionToFinish, taskToFinish);
-                return null;
+    private void startTimer() {
+        if (timer != null) timer.stop();
+        timer = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            remainingSeconds--;
+            updateTimerDisplay();
+            if (remainingSeconds <= 0) {
+                timer.stop();
+                isRunning = false;
+                onStop();
+                AlertUtil.showInfo("Focus Complete", "Great job! Your focus session has concluded.");
             }
-        };
-
-        finishTask.setOnSucceeded(e -> {
-            statusLabel.setText("Focus session completed");
-            AnimationUtil.success(statusLabel);
-            loadTasks();
-            loadHistory();
-            resetSessionState();
-        });
-
-        finishTask.setOnFailed(e -> {
-            AlertUtil.showError("Focus Mode", "Could not save the completed session.", finishTask.getException());
-            resetSessionState();
-        });
-
-        TaskExecutor.getInstance().workPool().submit(finishTask);
+        }));
+        timer.setCycleCount(Timeline.INDEFINITE);
+        timer.play();
     }
 
-    private void resetSessionState() {
-        activeSession = null;
-        activeTask = null;
-        running = false;
-        finishing = false;
-        taskCombo.setDisable(false);
-        durationSpinner.setDisable(false);
-        showTime(durationSpinner.getValue() * 60);
+    private void saveSessionIfEligible() {
+        if (sessionStartTime == null) return;
+        int elapsedMinutes = Math.max(1, selectedDurationMinutes - (remainingSeconds / 60));
+        Task selected = taskComboBox.getValue();
+        Integer taskId = selected != null ? selected.getId() : null;
+
+        // FocusSession(userId, taskId, durationMinutes, startedAt, endedAt)
+        FocusSession session = new FocusSession(
+                CurrentUser.getId(),
+                taskId,
+                elapsedMinutes,
+                sessionStartTime.toString(),
+                LocalDateTime.now().toString()
+        );
+
+        // FocusSessionDAO এর save(session) মেথড কল করা হয়েছে
+        TaskExecutor.getInstance().workPool().submit(() -> focusSessionDAO.save(session));
     }
 
-    private void showTime(int seconds) {
-        int min = Math.max(0, seconds) / 60;
-        int sec = Math.max(0, seconds) % 60;
-        timerLabel.setText(String.format("%02d:%02d", min, sec));
+    private void updateTimerDisplay() {
+        int minutes = remainingSeconds / 60;
+        int seconds = remainingSeconds % 60;
+        timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+    }
+
+    private void updateControlsState(boolean running, boolean paused) {
+        startButton.setDisable(running);
+        pauseButton.setDisable(!running || paused);
+        resumeButton.setDisable(!running || !paused);
+        stopButton.setDisable(!running);
+        durationSpinner.setDisable(running);
+        taskComboBox.setDisable(running);
+    }
+
+    private String getSelectedTaskTitle() {
+        Task t = taskComboBox.getValue();
+        return t != null ? t.getTitle() : "Deep Work";
     }
 
     @FXML
     private void onBackToDashboard() {
-        if (timeline != null) timeline.stop();
-        SceneManager.getInstance().invalidate("Dashboard");
+        if (isRunning && !AlertUtil.confirm("Exit Focus Mode", "A focus session is currently running. Leave anyway?")) {
+            return;
+        }
+        if (timer != null) timer.stop();
         SceneManager.getInstance().switchTo("Dashboard");
     }
-
-    private record HistoryData(List<FocusSession> sessions, Map<Integer, String> titles) {}
 }

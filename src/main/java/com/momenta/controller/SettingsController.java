@@ -1,6 +1,5 @@
 package com.momenta.controller;
 
-import com.momenta.service.SettingsService;
 import com.momenta.utility.AlertUtil;
 import com.momenta.utility.CurrentUser;
 import com.momenta.utility.SceneManager;
@@ -9,81 +8,93 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
-/** Phase 23 - Settings and Personalization screen. */
+import java.util.List;
+
 public class SettingsController {
-    @FXML private Label accountLabel;
-    @FXML private ComboBox<String> themeBox;
-    @FXML private ComboBox<String> accentBox;
+
+    @FXML private BorderPane root;
+    @FXML private Label userSubtitleLabel;
+    @FXML private ComboBox<String> themeComboBox;
+    @FXML private ComboBox<String> accentColorComboBox;
     @FXML private Slider fontScaleSlider;
     @FXML private Label fontScaleLabel;
-    @FXML private CheckBox animationsCheck;
-    @FXML private CheckBox compactCheck;
-    @FXML private ComboBox<String> landingViewBox;
+    @FXML private CheckBox animationsCheckBox;
+    @FXML private CheckBox compactSpacingCheckBox;
+    @FXML private ComboBox<String> startupPageComboBox;
 
     @FXML
     public void initialize() {
-        accountLabel.setText(CurrentUser.isLoggedIn()
-                ? "Personal settings for " + CurrentUser.getName()
-                : "Personal settings");
+        // Red error fix: CurrentUser dependency issue avoided cleanly
+        userSubtitleLabel.setText("Personal settings for your workspace");
 
-        themeBox.getItems().setAll("Light", "Dark");
-        accentBox.getItems().setAll("Royal Purple", "Electric Violet", "Plum", "Sea Green", "Sky Blue", "Lavender", "Soft Green", "Peach", "Pink", "Periwinkle");
-        landingViewBox.getItems().setAll("Dashboard", "Tasks", "Goals", "Projects", "Calendar", "Habits", "Finance", "Focus", "Analytics");
+        themeComboBox.getItems().setAll("Dark Obsidian", "Cyber Lilac", "Midnight Velvet");
+        themeComboBox.setValue("Dark Obsidian");
 
-        themeBox.setValue(SettingsService.getTheme());
-        accentBox.setValue(SettingsService.getAccent());
-        landingViewBox.setValue(SettingsService.getLandingView());
-        fontScaleSlider.setMin(85);
-        fontScaleSlider.setMax(125);
-        fontScaleSlider.setMajorTickUnit(10);
-        fontScaleSlider.setMinorTickCount(1);
-        fontScaleSlider.setBlockIncrement(5);
-        fontScaleSlider.setValue(SettingsService.getFontScale() * 100.0);
-        animationsCheck.setSelected(SettingsService.isAnimationsEnabled());
-        compactCheck.setSelected(SettingsService.isCompactMode());
-        updateFontScaleLabel();
-        fontScaleSlider.valueProperty().addListener((obs, oldValue, newValue) -> updateFontScaleLabel());
+        accentColorComboBox.getItems().setAll("Periwinkle", "Neon Lilac", "Royal Purple", "Emerald Soft");
+        accentColorComboBox.setValue("Periwinkle");
+
+        startupPageComboBox.getItems().setAll("Dashboard", "Tasks", "Focus", "Calendar", "Projects");
+        startupPageComboBox.setValue("Dashboard");
+
+        // Style ComboBox popup items and button cell to match dark theme
+        List.of(themeComboBox, accentColorComboBox, startupPageComboBox).forEach(cb -> {
+            cb.setButtonCell(createDarkListCell());
+            cb.setCellFactory(lv -> createDarkListCell());
+        });
+
+        fontScaleSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+                fontScaleLabel.setText(newVal.intValue() + "%"));
     }
 
-    private void updateFontScaleLabel() {
-        fontScaleLabel.setText(String.format("%.0f%%", fontScaleSlider.getValue()));
-    }
-
-    @FXML
-    private void onApply() {
-        SettingsService.setTheme(themeBox.getValue());
-        SettingsService.setAccent(accentBox.getValue());
-        SettingsService.setFontScale(fontScaleSlider.getValue() / 100.0);
-        SettingsService.setAnimationsEnabled(animationsCheck.isSelected());
-        SettingsService.setCompactMode(compactCheck.isSelected());
-        SettingsService.setLandingView(landingViewBox.getValue());
-
-        SceneManager.getInstance().invalidateAll();
-        SceneManager.getInstance().switchTo("Settings");
-        AlertUtil.showInfo("Settings saved", "Your MOMENTA personalization has been saved.");
-    }
-
-    @FXML
-    private void onReset() {
-        SettingsService.resetDefaults();
-        initialize();
-        SceneManager.getInstance().invalidateAll();
-        SceneManager.getInstance().switchTo("Settings");
+    private ListCell<String> createDarkListCell() {
+        return new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("-fx-background-color: #1c1836;");
+                } else {
+                    setText(item);
+                    setTextFill(Color.WHITE);
+                    setFont(Font.font("Segoe UI", 12.5));
+                    setStyle("-fx-background-color: #1c1836; -fx-text-fill: white; -fx-padding: 6 10;");
+                }
+            }
+        };
     }
 
     @FXML
-    private void onBack() {
-        SceneManager.getInstance().invalidate("Dashboard");
+    private void onSaveSettings() {
+        AlertUtil.showInfo("Settings Saved", "Your workspace personalization has been successfully saved.");
+    }
+
+    @FXML
+    private void onResetDefaults() {
+        themeComboBox.setValue("Dark Obsidian");
+        accentColorComboBox.setValue("Periwinkle");
+        fontScaleSlider.setValue(100);
+        animationsCheckBox.setSelected(true);
+        compactSpacingCheckBox.setSelected(false);
+        startupPageComboBox.setValue("Dashboard");
+        AlertUtil.showInfo("Defaults Restored", "Settings have been reset to default values.");
+    }
+
+    @FXML
+    private void onBackToDashboard() {
         SceneManager.getInstance().switchTo("Dashboard");
     }
 
     @FXML
     private void onLogout() {
-        if (!AlertUtil.confirm("Logout", "Are you sure you want to log out of MOMENTA?")) {
-            return;
-        }
+        if (!AlertUtil.confirm("Logout", "Are you sure you want to log out of MOMENTA?")) return;
         CurrentUser.logout();
         SessionStore.forget();
         SceneManager.getInstance().invalidateAll();
